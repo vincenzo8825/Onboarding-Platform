@@ -1,4 +1,11 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
+    @php
+        $viewCount = $viewCount ?? 0;
+        $recentViews = $recentViews ?? collect();
+    @endphp
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Dettagli Documento</h2>
@@ -26,12 +33,12 @@
                                 <span class="badge bg-success ms-2">Richiesto</span>
                             @endif
                         </div>
-                        
+
                         <div class="mb-3">
                             <strong>Descrizione:</strong>
                             <p class="mt-2">{{ $document->description ?: 'Nessuna descrizione disponibile' }}</p>
                         </div>
-                        
+
                         <div class="mb-3">
                             <strong>Visibilità:</strong>
                             @if($document->visibility === 'all')
@@ -42,24 +49,24 @@
                                 <span class="badge bg-info">Dipartimenti specifici</span>
                             @endif
                         </div>
-                        
+
                         <div class="mb-3">
                             <strong>Caricato da:</strong>
                             <span>{{ $document->uploader->name }}</span>
                         </div>
-                        
+
                         <div class="mb-3">
                             <strong>Data caricamento:</strong>
                             <span>{{ $document->created_at->format('d/m/Y H:i') }}</span>
                         </div>
-                        
+
                         @if($document->created_at != $document->updated_at)
                             <div class="mb-3">
                                 <strong>Ultima modifica:</strong>
                                 <span>{{ $document->updated_at->format('d/m/Y H:i') }}</span>
                             </div>
                         @endif
-                        
+
                         <div class="mt-4">
                             <a href="{{ Storage::url($document->file_path) }}" class="btn btn-primary" target="_blank">
                                 <i class="fas fa-download me-2"></i> Scarica Documento
@@ -68,7 +75,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-header">
@@ -79,11 +86,11 @@
                             <h3 class="mb-0">{{ $viewCount }}</h3>
                             <p class="text-muted">Visualizzazioni totali</p>
                         </div>
-                        
+
                         <hr>
-                        
+
                         <h6 class="mb-3">Visualizzazioni recenti</h6>
-                        
+
                         @if($recentViews->count() > 0)
                             <ul class="list-group">
                                 @foreach($recentViews as $view)

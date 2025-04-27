@@ -1,0 +1,153 @@
+
+.statistics {
+  margin-bottom: 3rem;
+}
+
+.statistics__header {
+  margin-bottom: 2rem;
+}
+
+.statistics__title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.statistics__description {
+  color: var(--secondary-color);
+  max-width: 800px;
+}
+
+.statistics__filter {
+  margin-bottom: 2rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+}
+
+.statistics__filter-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.statistics__filter-group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.statistics__filter-label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.statistics__filter-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.statistics__summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.statistics__summary-card {
+  flex: 1;
+  min-width: 200px;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.statistics__summary-title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.statistics__summary-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.statistics__summary-trend {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.statistics__summary-trend--up {
+  color: var(--success-color);
+}
+
+.statistics__summary-trend--down {
+  color: var(--danger-color);
+}
+
+.statistics__summary-trend-icon {
+  margin-right: 0.25rem;
+}
+
+.statistics__chart {
+  margin-bottom: 2rem;
+}
+
+.statistics__chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.statistics__chart-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.statistics__chart-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.statistics__chart-container {
+  height: 400px;
+  background-color: #fff;
+  padding: 1.5rem;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.statistics__table {
+  margin-bottom: 2rem;
+}
+
+.statistics__table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.statistics__table-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.statistics__table-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.statistics__export {
+  margin-top: 2rem;
+  text-align: right;
+}

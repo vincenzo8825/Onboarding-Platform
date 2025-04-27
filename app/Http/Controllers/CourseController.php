@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\CourseAssigned;
 use App\Models\Course;
 use App\Models\User;
 use App\Models\UserCourse;
@@ -159,6 +160,17 @@ class CourseController extends Controller
             })
         );
 
+        // Emetti l'evento per ogni utente a cui è stato assegnato il corso
+        foreach ($validated['user_ids'] as $userId) {
+            $user = User::find($userId);
+            if ($user) {
+                // Invio diretto della notifica per garantire che funzioni
+                $user->notify(new \App\Notifications\CourseAssignedNotification($course, auth()->user()));
+                // Emissione dell'evento come backup
+            event(new CourseAssigned($course, $user, auth()->user()));
+            }
+        }
+
         return redirect()->route('admin.courses.show', $course)
             ->with('success', 'Corso assegnato a ' . count($validated['user_ids']) . ' utenti con successo');
     }
@@ -170,4 +182,17 @@ class CourseController extends Controller
     {
         return view('admin.courses.quiz.create', compact('course'));
     }
+
+    // Rimuovere questo metodo duplicato
+    // public function assign(Request $request, Course $course)
+    // {
+    //     // Codice esistente per l'assegnazione del corso
+    //     $user = User::findOrFail($request->user_id);
+    //     $course->users()->attach($user->id);
+    //
+    //     // Emetti l'evento per la notifica
+    //     event(new CourseAssigned($course, $user, auth()->user()));
+    //
+    //     return redirect()->back()->with('success', 'Corso assegnato con successo');
+    // }
 }

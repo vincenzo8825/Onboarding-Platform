@@ -1,0 +1,171 @@
+
+.report-card {
+  margin-bottom: 2rem;
+}
+
+.report-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.report-card__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.report-card__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.report-card__body {
+  min-height: 300px;
+}
+
+.report-filter {
+  margin-bottom: 2rem;
+}
+
+.report-filter__form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  align-items: flex-end;
+}
+
+.report-filter__group {
+  flex: 1;
+  min-width: 200px;
+}
+
+.report-filter__label {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  display: block;
+}
+
+.report-filter__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.report-summary {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.report-summary__item {
+  flex: 1;
+  min-width: 200px;
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.report-summary__title {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.report-summary__value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}
+
+.report-summary__trend {
+  display: flex;
+  align-items: center;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+}
+
+.report-summary__trend--up {
+  color: var(--success-color);
+}
+
+.report-summary__trend--down {
+  color: var(--danger-color);
+}
+
+.report-summary__trend-icon {
+  margin-right: 0.25rem;
+}
+
+.report-table {
+  margin-bottom: 2rem;
+}
+
+.report-table__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.report-table__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.report-table__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.report-chart {
+  margin-bottom: 2rem;
+}
+
+.report-chart__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.report-chart__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.report-chart__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.report-chart__body {
+  height: 400px;
+}
+
+.report-chart__legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.report-chart__legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.report-chart__legend-color {
+  width: 1rem;
+  height: 1rem;
+  border-radius: 0.25rem;
+  margin-right: 0.5rem;
+}
+
+.report-chart__legend-text {
+  font-size: 0.9rem;
+}

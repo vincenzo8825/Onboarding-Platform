@@ -16,6 +16,16 @@ class EnsureUserIsApproved
      */
     public function handle(Request $request, Closure $next): Response
     {
+        if (!Auth::check()) {
+            return redirect()->route('login');
+        }
+
+        // Gli admin sono sempre considerati approvati
+        if (Auth::user()->hasRole('admin')) {
+            return $next($request);
+        }
+
+        // Per gli altri utenti (dipendenti, new_hire, ecc.) verifica se sono approvati
         if (!Auth::user()->is_approved) {
             return redirect()->route('waiting-approval');
         }

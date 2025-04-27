@@ -111,4 +111,12 @@ class Document extends Model
             'approved_by' => $approverId,
         ]);
     }
+
+    /**
+     * Get all distinct categories from documents.
+     */
+    public static function getCategories()
+    {
+        return self::distinct('category')->pluck('category')->filter()->toArray();
+    }
 }

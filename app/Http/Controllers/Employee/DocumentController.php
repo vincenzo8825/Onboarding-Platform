@@ -56,6 +56,7 @@ class DocumentController extends Controller
     /**
      * Store a newly created document.
      */
+    // Quando un dipendente carica un documento
     public function store(Request $request)
     {
         $request->validate([

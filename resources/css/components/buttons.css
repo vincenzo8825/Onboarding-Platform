@@ -1,0 +1,248 @@
+/* Button Styles con BEM */
+.btn {
+  font-weight: 500;
+  letter-spacing: 0.03em;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border-radius: 8px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  height: auto;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+}
+
+.btn-sm {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.8rem;
+  border-radius: 6px;
+}
+
+.btn-lg {
+  padding: 0.75rem 1.5rem;
+  font-size: 1rem;
+  border-radius: 10px;
+}
+
+.btn-xs {
+  padding: 0.2rem 0.5rem;
+  font-size: 0.75rem;
+  border-radius: 4px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.btn:focus {
+  box-shadow: 0 0 0 3px rgba(var(--primary-color-rgb), 0.25);
+}
+
+/* Effetto ripple sui pulsanti */
+.btn::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background-color: rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  opacity: 0;
+  transition: width 0.5s, height 0.5s, opacity 0.5s;
+}
+
+.btn:active::after {
+  width: 300px;
+  height: 300px;
+  opacity: 1;
+  transition: 0s;
+}
+
+/* Bottoni con icone */
+.btn i, .btn .fas, .btn .far {
+  margin-right: 0.5rem;
+  font-size: 0.9em;
+}
+
+.btn i:only-child, .btn .fas:only-child, .btn .far:only-child {
+  margin-right: 0;
+}
+
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-icon__icon {
+  margin-right: 0.5rem;
+}
+
+.btn-icon--right .btn-icon__icon {
+  margin-right: 0;
+  margin-left: 0.5rem;
+}
+
+/* Pulsanti di azione circolari */
+.btn-action {
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.btn-action:hover {
+  transform: scale(1.1);
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+}
+
+.btn-action--sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.btn-action--lg {
+  width: 3rem;
+  height: 3rem;
+}
+
+.btn-action--xs {
+  width: 1.5rem;
+  height: 1.5rem;
+  font-size: 0.7rem;
+}
+
+.btn-group-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Posizionamento dei bottoni nei container flex */
+.d-flex .btn {
+  flex-shrink: 0;
+}
+
+/* Stili specifici per i tipi di pulsanti */
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary-color), var(--primary-color-dark));
+  border: none;
+}
+
+.btn-outline-primary {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.btn-outline-primary:hover {
+  background-color: rgba(var(--primary-color-rgb), 0.08);
+  color: var(--primary-color-dark);
+}
+
+.btn-success {
+  background: linear-gradient(135deg, var(--success-color), var(--success-color-dark));
+  border: none;
+}
+
+.btn-outline-success {
+  border-color: var(--success-color);
+  color: var(--success-color);
+}
+
+.btn-outline-success:hover {
+  background-color: rgba(var(--success-color-rgb), 0.08);
+  color: var(--success-color-dark);
+}
+
+.btn-danger {
+  background: linear-gradient(135deg, var(--danger-color), var(--danger-color-dark));
+  border: none;
+}
+
+.btn-outline-danger {
+  border-color: var(--danger-color);
+  color: var(--danger-color);
+}
+
+.btn-outline-danger:hover {
+  background-color: rgba(var(--danger-color-rgb), 0.08);
+  color: var(--danger-color-dark);
+}
+
+/* Pulsante con stato di caricamento */
+.btn.is-loading {
+  color: transparent !important;
+  pointer-events: none;
+  position: relative;
+}
+
+.btn.is-loading::after {
+  content: "";
+  position: absolute;
+  width: 1rem;
+  height: 1rem;
+  top: calc(50% - 0.5rem);
+  left: calc(50% - 0.5rem);
+  border: 2px solid rgba(255, 255, 255, 0.5);
+  border-radius: 50%;
+  border-top-color: white;
+  animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive buttons in table views */
+@media (max-width: 768px) {
+  .table .btn {
+    padding: 0.3rem 0.6rem;
+    font-size: 0.8rem;
+  }
+
+  .table .btn-group {
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .table .btn-group > .btn {
+    border-radius: 4px !important;
+    margin-left: 0 !important;
+  }
+}
+
+/* Bottoni in card footer */
+.card-footer .btn {
+  margin-top: 0.25rem;
+  margin-bottom: 0.25rem;
+}
+
+/* Bottoni in gruppi */
+.btn-group .btn {
+  position: relative;
+  z-index: 1;
+}
+
+.btn-group .btn:focus {
+  z-index: 3;
+}
+
+.btn-group .btn:hover {
+  z-index: 2;
+}

@@ -11,20 +11,24 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('event_participants', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('event_id')->constrained()->cascadeOnDelete();
-            $table->foreignId('user_id')->constrained()->cascadeOnDelete();
-            $table->timestamp('registered_at')->nullable();
-            $table->string('status')->default('registered');
-            $table->boolean('attended')->default(false);
-            $table->text('feedback')->nullable();
-            $table->integer('rating')->nullable();
-            $table->timestamps();
+        // La tabella potrebbe già esistere a causa di migrazioni successive
+        // Verifichiamo se la tabella esiste prima di crearla
+        if (!Schema::hasTable('event_participants')) {
+            Schema::create('event_participants', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('event_id')->constrained()->cascadeOnDelete();
+                $table->foreignId('user_id')->constrained()->cascadeOnDelete();
+                $table->timestamp('registered_at')->nullable();
+                $table->string('status')->default('registered');
+                $table->boolean('attended')->default(false);
+                $table->text('feedback')->nullable();
+                $table->integer('rating')->nullable();
+                $table->timestamps();
 
-            // Composte unique to prevent duplicate registrations
-            $table->unique(['event_id', 'user_id']);
-        });
+                // Composte unique to prevent duplicate registrations
+                $table->unique(['event_id', 'user_id']);
+            });
+        }
     }
 
     /**
@@ -32,6 +36,7 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('event_participants');
+        // Non eliminiamo la tabella qui, poiché potrebbe essere necessaria per altre migrazioni
+        // Le migrazioni successive hanno già aggiunto altre colonne a questa tabella
     }
 };

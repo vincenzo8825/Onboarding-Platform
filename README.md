@@ -59,3 +59,131 @@ If you discover a security vulnerability within Laravel, please send an e-mail t
 ## License
 
 The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+
+# Sistema di Notifiche - Piattaforma di Onboarding
+
+Questa documentazione spiega come funziona il sistema di notifiche implementato nella piattaforma di onboarding.
+
+## Panoramica
+
+Il sistema di notifiche utilizza il framework integrato di Laravel per gestire notifiche tra admin e dipendenti. È stato progettato per:
+
+- Notificare agli admin le azioni dei dipendenti
+- Notificare ai dipendenti le azioni degli admin
+- Visualizzare le notifiche in un dropdown nella navbar
+- Filtrare le notifiche per stato (lette/non lette)
+- Contrassegnare le notifiche come lette
+
+## Implementazione Tecnica
+
+### Componenti principali:
+
+1. **Modello User con Trait Notifiable**
+   - Il trait `Illuminate\Notifications\Notifiable` è incluso nel modello User
+   - Questo trait aggiunge funzionalità per inviare e ricevere notifiche
+
+2. **Classi di Notifica**
+   - Ogni tipo di notifica ha una propria classe in `app/Notifications/`
+   - Esempi: `DocumentUploadedNotification`, `NewTicketReplyNotification`, ecc.
+
+3. **Controller delle Notifiche**
+   - `NotificationsController` gestisce visualizzazione e gestione delle notifiche
+   - Include metodi per contrassegnare le notifiche come lette
+
+4. **Database**
+   - Le notifiche sono memorizzate nella tabella `notifications`
+   - Le notifiche non lette sono facilmente identificabili dal campo `read_at` nullo
+
+5. **Frontend**
+   - Componente `notifications-dropdown.blade.php` per visualizzare le notifiche
+   - JavaScript per azioni come "segna come letta" senza ricaricare la pagina
+
+## Come inviare una notifica
+
+### Passaggio 1: Creare una classe di notifica
+```php
+php artisan make:notification NomeNotifica
+```
+
+### Passaggio 2: Configurare la classe
+```php
+<?php
+
+namespace App\Notifications;
+
+use Illuminate\Notifications\Notification;
+use Illuminate\Notifications\Messages\MailMessage;
+
+class NomeNotifica extends Notification
+{
+    // Configura costruttore con i dati necessari
+    
+    // Configura canali di consegna
+    public function via($notifiable)
+    {
+        return ['database', 'mail']; // Possibilità di usare più canali
+    }
+    
+    // Definisci il formato per email
+    public function toMail($notifiable)
+    {
+        return (new MailMessage)
+            ->subject('Titolo della notifica')
+            ->line('Contenuto della notifica');
+    }
+    
+    // Definisci il formato per database
+    public function toArray($notifiable)
+    {
+        return [
+            'title' => 'Titolo della notifica',
+            'message' => 'Messaggio della notifica',
+            'url' => '/percorso/rilevante',
+        ];
+    }
+}
+```
+
+### Passaggio 3: Inviare la notifica
+```php
+// Notifica a un singolo utente
+$user->notify(new NomeNotifica($data));
+
+// Notifica a più utenti
+Notification::send($users, new NomeNotifica($data));
+```
+
+## Esempi di Notifiche
+
+### Notifica da Dipendente ad Admin
+```php
+// Quando un dipendente carica un documento
+$admins = User::whereHas('roles', function ($query) {
+    $query->where('name', 'admin');
+})->get();
+
+Notification::send($admins, new DocumentUploadedNotification($document, $user));
+```
+
+### Notifica da Admin a Dipendente
+```php
+// Quando un admin approva un documento
+$employee->notify(new DocumentApprovedNotification($document, Auth::user()));
+```
+
+## Visualizzazione Notifiche
+
+Le notifiche vengono visualizzate in un dropdown accessibile dall'icona della campana nella navbar. Le notifiche non lette hanno un design distintivo e includono:
+
+- Icona specifica per il tipo di notifica
+- Titolo
+- Messaggio breve
+- Data/ora relativa
+- Pulsante per contrassegnare come letta
+
+## Best Practices
+
+1. **Mantieni le notifiche concise** - Le notifiche dovrebbero essere chiare e contenere informazioni essenziali
+2. **Includi sempre un URL** - Ogni notifica dovrebbe portare a una pagina rilevante
+3. **Considera l'utilizzo di code** - Per notifiche di massa, usa la funzionalità di code di Laravel implementando l'interfaccia `ShouldQueue`
+4. **Mantieni un UX coerente** - Usa icone e colori coerenti per tipi simili di notifiche

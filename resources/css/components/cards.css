@@ -1,0 +1,425 @@
+
+.card {
+  border: none;
+  border-radius: 12px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.06);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  overflow: hidden;
+  background-color: #fff;
+  margin-bottom: 1.5rem;
+}
+
+.card:hover {
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.card-header {
+  padding: 1.25rem 1.5rem;
+  background-color: transparent;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  background-color: rgba(0, 0, 0, 0.01);
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.card-title {
+  margin-bottom: 0.75rem;
+  font-weight: 600;
+  color: var(--dark-color);
+}
+
+.card-subtitle {
+  color: var(--secondary-color);
+  margin-top: -0.5rem;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+}
+
+/* Stats Card */
+.stat-card {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+  border-left: 4px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.stat-card-primary {
+  border-left-color: var(--primary-color);
+}
+
+.stat-card-success {
+  border-left-color: var(--success-color);
+}
+
+.stat-card-info {
+  border-left-color: var(--info-color);
+}
+
+.stat-card-warning {
+  border-left-color: var(--warning-color);
+}
+
+.stat-card-danger {
+  border-left-color: var(--danger-color);
+}
+
+.stat-card:before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(var(--primary-color-rgb), 0.05), transparent);
+  opacity: 0;
+  transition: all 0.3s ease;
+}
+
+.stat-card:hover:before {
+  opacity: 1;
+}
+
+.stat-card .card-body {
+  display: flex;
+  align-items: center;
+  padding: 1.5rem;
+}
+
+.stat-card .icon-wrapper {
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
+}
+
+.stat-card-primary .icon-wrapper {
+  background-color: var(--primary-color-rgb-op10);
+  color: var(--primary-color);
+}
+
+.stat-card-success .icon-wrapper {
+  background-color: var(--success-color-rgb-op10);
+  color: var(--success-color);
+}
+
+.stat-card-info .icon-wrapper {
+  background-color: var(--info-color-rgb-op10);
+  color: var(--info-color);
+}
+
+.stat-card-warning .icon-wrapper {
+  background-color: var(--warning-color-rgb-op10);
+  color: var(--warning-color);
+}
+
+.stat-card-danger .icon-wrapper {
+  background-color: var(--danger-color-rgb-op10);
+  color: var(--danger-color);
+}
+
+.stat-card .icon {
+  font-size: 1.75rem;
+}
+
+.stat-card .stat-content {
+  flex-grow: 1;
+}
+
+.stat-card .stat-title {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+  color: var(--secondary-color);
+  margin-bottom: 0.25rem;
+}
+
+.stat-card .stat-value {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+  color: var(--dark-color);
+}
+
+.stat-card .stat-subtitle {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+}
+
+.stat-card .stat-action {
+  background-color: white;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+  padding: 0.75rem 1.5rem;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.stat-card .stat-action a {
+  font-weight: 500;
+  font-size: 0.875rem;
+  color: var(--primary-color);
+  text-decoration: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+}
+
+.stat-card .stat-action a i {
+  margin-left: 0.35rem;
+  transition: all 0.2s ease;
+}
+
+.stat-card .stat-action a:hover {
+  color: var(--primary-color-dark);
+}
+
+.stat-card .stat-action a:hover i {
+  transform: translateX(3px);
+}
+
+/* Progress Card */
+.progress-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.progress-card .progress {
+  height: 8px;
+  border-radius: 4px;
+  margin: 0.5rem 0;
+  overflow: hidden;
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.progress-card .progress-bar {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-card .progress-bar:after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(45deg, rgba(255, 255, 255, 0.2) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.2) 50%, rgba(255, 255, 255, 0.2) 75%, transparent 75%, transparent);
+  background-size: 20px 20px;
+  animation: progressAnimation 2s linear infinite;
+}
+
+@keyframes progressAnimation {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 20px 0;
+  }
+}
+
+/* Task Card */
+.task-card {
+  border-radius: 12px;
+  border: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+}
+
+.task-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+.task-card .list-group-item {
+  border: none;
+  padding: 1rem 1.25rem;
+  position: relative;
+  transition: all 0.2s ease;
+}
+
+.task-card .list-group-item:not(:last-child) {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.task-card .list-group-item:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}
+
+.task-card .task-checkbox {
+  cursor: pointer;
+}
+
+.task-card .task-label {
+  margin-bottom: 0;
+  transition: all 0.2s ease;
+}
+
+.task-card .task-completed .task-label {
+  text-decoration: line-through;
+  color: var(--secondary-color);
+  opacity: 0.7;
+}
+
+.task-card .task-meta {
+  display: flex;
+  align-items: center;
+  color: var(--secondary-color);
+  font-size: 0.85rem;
+  margin-top: 0.5rem;
+}
+
+.task-card .task-date {
+  display: flex;
+  align-items: center;
+  margin-right: 1rem;
+}
+
+.task-card .task-date i {
+  margin-right: 0.35rem;
+}
+
+/* Chart Card */
+.chart-card {
+  overflow: hidden;
+}
+
+.chart-card .chart-container {
+  position: relative;
+  min-height: 300px;
+  padding: 1rem;
+}
+
+.chart-card .chart-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.chart-card .chart-subtitle {
+  font-size: 0.85rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.chart-card .chart-legend {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.chart-card .legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.chart-card .legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 3px;
+  margin-right: 0.5rem;
+}
+
+.chart-card .legend-label {
+  font-size: 0.875rem;
+  color: var(--secondary-color);
+}
+
+/* Document Card */
+.document-card {
+  height: 100%;
+}
+
+.document-card__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.document-card__title {
+  margin-bottom: 0;
+  font-weight: 600;
+}
+
+.document-card__body {
+  display: flex;
+  flex-direction: column;
+}
+
+.document-card__description {
+  flex-grow: 1;
+  margin-bottom: var(--spacing-md);
+}
+
+.document-card__badge {
+  align-self: flex-start;
+}
+
+.document-card__badge--approved {
+  background-color: var(--success-color);
+}
+
+.document-card__badge--pending {
+  background-color: var(--warning-color);
+}
+
+.document-card__badge--rejected {
+  background-color: var(--danger-color);
+}
+
+/* Dashboard Card */
+.dashboard-card {
+  border-left: 4px solid transparent;
+}
+
+.dashboard-card--primary {
+  border-left-color: var(--primary-color);
+}
+
+.dashboard-card--success {
+  border-left-color: var(--success-color);
+}
+
+.dashboard-card--warning {
+  border-left-color: var(--warning-color);
+}
+
+.dashboard-card--danger {
+  border-left-color: var(--danger-color);
+}
+
+.dashboard-card__icon {
+  font-size: 2rem;
+  color: #e9ecef;
+}
+
+.dashboard-card__title {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1rem;
+  font-weight: 700;
+  color: var(--secondary-color);
+  margin-bottom: 0.5rem;
+}
+
+.dashboard-card__value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0;
+}

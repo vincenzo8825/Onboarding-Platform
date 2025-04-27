@@ -1,0 +1,250 @@
+
+.roles {
+  margin-bottom: 3rem;
+}
+
+.roles__header {
+  margin-bottom: 2rem;
+}
+
+.roles__title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.roles__description {
+  color: var(--secondary-color);
+  max-width: 800px;
+}
+
+.roles__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.roles__search {
+  max-width: 300px;
+}
+
+.roles__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.role-card {
+  background-color: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.role-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+}
+
+.role-card__header {
+  padding: 1.5rem;
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.role-card__title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.role-card__subtitle {
+  opacity: 0.8;
+  margin-bottom: 0;
+}
+
+.role-card__body {
+  padding: 1.5rem;
+}
+
+.role-card__stats {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.role-card__stat {
+  flex: 1;
+  text-align: center;
+}
+
+.role-card__stat-value {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 0.25rem;
+}
+
+.role-card__stat-label {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+.role-card__permissions {
+  margin-bottom: 1.5rem;
+}
+
+.role-card__permissions-title {
+  font-weight: 600;
+  margin-bottom: 1rem;
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+  text-transform: uppercase;
+  letter-spacing: 0.05rem;
+}
+
+.role-card__permissions-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.role-card__permission {
+  padding: 0.25rem 0.5rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+.role-card__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+}
+
+/* Role Detail */
+.role-detail {
+  margin-bottom: 3rem;
+}
+
+.role-detail__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.role-detail__title-group {
+  flex-grow: 1;
+}
+
+.role-detail__title {
+  font-weight: 700;
+  margin-bottom: 0.5rem;
+}
+
+.role-detail__subtitle {
+  color: var(--secondary-color);
+}
+
+.role-detail__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.role-detail__tabs {
+  margin-bottom: 2rem;
+}
+
+.role-detail__tab-content {
+  padding: 1.5rem;
+  background-color: #fff;
+  border-radius: 0.25rem;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.permissions {
+  margin-bottom: 2rem;
+}
+
+.permissions__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.permissions__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.permissions__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.permissions__group {
+  margin-bottom: 2rem;
+}
+
+.permissions__group-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem;
+  background-color: #f8f9fa;
+  border-radius: 0.25rem;
+  margin-bottom: 1rem;
+}
+
+.permissions__group-title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.permissions__group-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.permissions__group-toggle-label {
+  font-size: 0.9rem;
+  color: var(--secondary-color);
+}
+
+.permissions__list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.permission-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background-color: #fff;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+}
+
+.permission-item__checkbox {
+  margin-right: 0.75rem;
+}
+
+.permission-item__info {
+  flex-grow: 1;
+}
+
+.permission-item__name {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.permission-item__description {
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+  margin-bottom: 0;
+}

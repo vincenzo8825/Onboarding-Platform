@@ -1,195 +1,272 @@
 <x-layout>
     <x-slot name="styles">
-        <style>
-            /* Stili aggiuntivi per la pagina delle notifiche */
-            .notification-item {
-                transition: background-color 0.3s ease;
-            }
-            .notification-date {
-                font-size: 0.9rem;
-                color: #6c757d;
-            }
-        </style>
+        @vite('resources/css/pages/notifications.css')
     </x-slot>
 
-    <div class="container">
-        <div class="row justify-content-center">
-            <div class="col-md-10">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Notifiche</h5>
+    <div class="container py-4">
+        <div class="row">
+            <div class="col-12">
+                <div class="notifications-page__header">
+                    <h1 class="notifications-page__title">Notifiche</h1>
 
-                        @if (count(auth()->user()->unreadNotifications) > 0)
-                            <button id="mark-all" class="btn btn-success">Segna tutte come lette</button>
+                    <div class="notifications-page__actions">
+                        <div class="btn-group" role="group">
+                            <a href="{{ route('notifications.index') }}" class="btn btn-outline-primary {{ !request('filter') ? 'active' : '' }}">
+                                Tutte
+                            </a>
+                            <a href="{{ route('notifications.index', ['filter' => 'unread']) }}" class="btn btn-outline-primary {{ request('filter') == 'unread' ? 'active' : '' }}">
+                                Non lette
+                            </a>
+                            <a href="{{ route('notifications.index', ['filter' => 'read']) }}" class="btn btn-outline-primary {{ request('filter') == 'read' ? 'active' : '' }}">
+                                Lette
+                            </a>
+                        </div>
+
+                        @if($notifications->where('read_at', null)->count() > 0)
+                        <form id="markAllAsReadForm" method="POST" action="{{ route('notifications.mark-all-as-read') }}" style="display: inline;">
+                            @csrf
+                            <button id="markAllAsReadBtn" type="button" class="btn btn-outline-primary">
+                            <i class="fas fa-check-double me-1"></i> Segna tutte come lette
+                        </button>
+                        </form>
                         @endif
                     </div>
+                </div>
 
-                    <div class="card-body">
-                        @if (count($notifications) > 0)
-                            <div class="list-group">
-                                @foreach ($notifications as $notification)
-                                    <div class="list-group-item list-group-item-action {{ $notification->read_at ? '' : 'list-group-item-primary' }} notification-item"
-                                         data-id="{{ $notification->id }}">
-                                        <div class="d-flex w-100 justify-content-between mb-2">
-                                            <h5 class="mb-1 fw-bold">
-                                                @if ($notification->type === 'App\Notifications\EmployeeRegistered')
-                                                    <i class="fas fa-user-plus text-success me-2"></i>Nuova registrazione dipendente
-                                                @elseif ($notification->type === 'App\Notifications\DocumentUploaded')
-                                                    <i class="fas fa-file-upload text-primary me-2"></i>Documento caricato
-                                                @elseif ($notification->type === 'App\Notifications\DocumentApproved')
-                                                    <i class="fas fa-file-check text-success me-2"></i>Documento approvato
-                                                @elseif ($notification->type === 'App\Notifications\DocumentRejected')
-                                                    <i class="fas fa-file-times text-danger me-2"></i>Documento rifiutato
-                                                @else
-                                                    <i class="fas fa-bell text-secondary me-2"></i>Notifica
-                                                @endif
-                                            </h5>
-                                            <small class="notification-date">{{ $notification->created_at->format('d/m/Y H:i') }}</small>
-                                        </div>
+                <div class="notifications-page__list">
+                    @forelse($notifications as $notification)
+                        <div class="notifications-page-item {{ $notification->read_at ? '' : 'notifications-page-item--unread' }}" data-id="{{ $notification->id }}">
+                            <div class="notifications-page-item__header">
+                                <div class="d-flex align-items-center">
+                                    @php
+                                        $iconClass = 'fas fa-bell';
+                                        $bgColor = 'info';
 
-                                        <p class="mb-3">{{ $notification->data['message'] ?? '' }}</p>
-
-                                        <div class="d-flex justify-content-between align-items-center">
-                                            <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-
-                                            <div>
-                                                @if (!$notification->read_at)
-                                                    <button class="btn btn-sm btn-outline-primary mark-as-read" data-id="{{ $notification->id }}">
-                                                        Segna come letta
-                                                    </button>
-                                                @else
-                                                    <span class="badge bg-secondary">Letta</span>
-                                                @endif
-
-                                                @if(isset($notification->data['url']))
-                                                    <a href="{{ $notification->data['url'] }}" class="btn btn-sm btn-primary ms-2">
-                                                        Visualizza
-                                                    </a>
-                                                @endif
-                                            </div>
-                                        </div>
+                                        if (Str::contains($notification->type, 'DocumentRequest')) {
+                                            $iconClass = 'fas fa-file-upload';
+                                            $bgColor = 'danger';
+                                        } elseif (Str::contains($notification->type, 'Document')) {
+                                            $iconClass = 'fas fa-file-alt';
+                                            $bgColor = 'success';
+                                        } elseif (Str::contains($notification->type, 'Ticket')) {
+                                            $iconClass = 'fas fa-ticket-alt';
+                                            $bgColor = 'warning';
+                                        } elseif (Str::contains($notification->type, 'Event')) {
+                                            $iconClass = 'fas fa-calendar-alt';
+                                            $bgColor = 'primary';
+                                        } elseif (Str::contains($notification->type, 'Course')) {
+                                            $iconClass = 'fas fa-graduation-cap';
+                                            $bgColor = 'secondary';
+                                        } elseif (Str::contains($notification->type, 'Checklist')) {
+                                            $iconClass = 'fas fa-tasks';
+                                            $bgColor = 'info';
+                                        } elseif (Str::contains($notification->type, 'Badge')) {
+                                            $iconClass = 'fas fa-award';
+                                            $bgColor = 'warning';
+                                        }
+                                    @endphp
+                                    <div class="notification-icon bg-{{ $bgColor }} text-white rounded-circle p-2 me-3">
+                                        <i class="{{ $iconClass }}"></i>
                                     </div>
-                                @endforeach
+                                    <h4 class="notifications-page-item__title">{{ $notification->data['title'] ?? 'Notifica' }}</h4>
+                                </div>
+                                <span class="notifications-page-item__date">{{ $notification->created_at->format('d/m/Y H:i') }} ({{ $notification->created_at->diffForHumans() }})</span>
                             </div>
+                            <div class="notifications-page-item__content">
+                                <p>{{ $notification->data['message'] ?? 'Nessun messaggio' }}</p>
+                            </div>
+                            <div class="notifications-page-item__actions">
+                                @if(!$notification->read_at)
+                                    <form method="POST" action="{{ route('notifications.mark-as-read', $notification->id) }}" style="display:inline;">
+                                        @csrf
+                                        <button class="btn btn-sm btn-outline-secondary mark-as-read-btn" type="button" data-id="{{ $notification->id }}">
+                                        <i class="fas fa-check me-1"></i> Segna come letta
+                                    </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="notifications-page__empty-state">
+                            <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                            <h4>Nessuna notifica</h4>
+                            <p class="text-muted">Non hai notifiche da visualizzare</p>
+                        </div>
+                    @endforelse
+                </div>
 
-                            <div class="mt-4 d-flex justify-content-center">
-                                {{ $notifications->links() }}
-                            </div>
-                        @else
-                            <div class="alert alert-info text-center py-5">
-                                <i class="fas fa-bell-slash fa-3x mb-3"></i>
-                                <p class="mb-0">Non hai notifiche.</p>
-                            </div>
-                        @endif
-                    </div>
+                <div class="d-flex justify-content-center mt-4">
+                    {{ $notifications->links() }}
                 </div>
             </div>
         </div>
     </div>
 
-    <x-slot name="sidebar">
-        <div class="nav flex-column">
-            <a href="{{ auth()->user()->isAdmin() ? route('admin.dashboard') : route('employee.dashboard') }}"
-               class="nav-link link-dark">
-                <i class="fas fa-tachometer-alt me-2"></i>
-                Dashboard
-            </a>
-            <a href="{{ route('notifications.index') }}"
-               class="nav-link link-dark active">
-                <i class="fas fa-bell me-2"></i>
-                Notifiche
-            </a>
-        </div>
-    </x-slot>
-
     @push('scripts')
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Segna singola notifica come letta
-            document.querySelectorAll('.mark-as-read').forEach(button => {
+            // Gestione pulsante segna come letta
+            document.querySelectorAll('.mark-as-read-btn').forEach(button => {
                 button.addEventListener('click', function() {
                     const id = this.getAttribute('data-id');
-                    const button = this;
-
-                    fetch(`/notifications/${id}/mark-as-read`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Aggiorna visivamente l'elemento della notifica
-                            const notificationItem = button.closest('.list-group-item');
-                            notificationItem.classList.remove('list-group-item-primary');
-
-                            // Sostituisci il pulsante con il badge "Letta"
-                            const badge = document.createElement('span');
-                            badge.className = 'badge bg-secondary';
-                            badge.textContent = 'Letta';
-
-                            // Sostituisci il pulsante col badge
-                            button.parentNode.replaceChild(badge, button);
-
-                            // Aggiorna il contatore delle notifiche non lette nell'interfaccia
-                            updateUnreadCount();
-                        }
-                    });
+                    const form = this.closest('form');
+                    if (form) {
+                        // Invia il form tramite AJAX
+                        const formData = new FormData(form);
+                        markAsReadWithForm(form.action, formData, id, this);
+                    }
                 });
             });
 
-            // Segna tutte le notifiche come lette
-            const markAllButton = document.getElementById('mark-all');
-            if (markAllButton) {
-                markAllButton.addEventListener('click', function() {
-                    fetch('/notifications/mark-all-as-read', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        }
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Rimuovi evidenziazione da tutte le notifiche
-                            document.querySelectorAll('.list-group-item-primary').forEach(item => {
-                                item.classList.remove('list-group-item-primary');
-                            });
-
-                            // Sostituisci tutti i pulsanti "Segna come letta" con il badge
-                            document.querySelectorAll('.mark-as-read').forEach(btn => {
-                                const badge = document.createElement('span');
-                                badge.className = 'badge bg-secondary';
-                                badge.textContent = 'Letta';
-                                btn.parentNode.replaceChild(badge, btn);
-                            });
-
-                            // Nascondi il pulsante "Segna tutte come lette"
-                            markAllButton.style.display = 'none';
-
-                            // Mostra un messaggio di successo
-                            const alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-success alert-dismissible fade show mt-3';
-                            alertDiv.innerHTML = `
-                                ${data.message}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            `;
-                            document.querySelector('.card-body').prepend(alertDiv);
-                        }
-                    });
+            // Gestione pulsante segna tutte come lette
+            const markAllAsReadBtn = document.getElementById('markAllAsReadBtn');
+            if (markAllAsReadBtn) {
+                markAllAsReadBtn.addEventListener('click', function() {
+                    const form = document.getElementById('markAllAsReadForm');
+                    if (form) {
+                        // Invia il form tramite AJAX
+                        const formData = new FormData(form);
+                        markAllAsReadWithForm(form.action, formData);
+                    }
                 });
             }
 
-            function updateUnreadCount() {
-                // Conta quante notifiche non lette ci sono ancora
-                const unreadCount = document.querySelectorAll('.list-group-item-primary').length;
+            // Ascolta gli eventi di aggiornamento notifiche dal dropdown
+            document.addEventListener('notifications-updated', function(e) {
+                // Aggiorna la UI se necessario
+                if (e.detail && e.detail.unreadCount === 0) {
+                    // Se siamo nella vista delle notifiche non lette, aggiorna
+                    if (window.location.href.includes('filter=unread')) {
+                        window.location.reload();
+                    }
+                }
+            });
 
-                // Nascondi il pulsante "Segna tutte come lette" se non ci sono più notifiche non lette
-                if (unreadCount === 0 && markAllButton) {
-                    markAllButton.style.display = 'none';
+            // Funzione per marcare una notifica come letta usando un form
+            function markAsReadWithForm(url, formData, id, buttonElement) {
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore nel server');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const notificationItem = document.querySelector(`div[data-id="${id}"]`);
+                        notificationItem.classList.remove('notifications-page-item--unread');
+
+                        // Rimuovi il form che contiene il pulsante
+                        if (buttonElement) {
+                            const form = buttonElement.closest('form');
+                            if (form) form.remove();
+                    }
+
+                        // Aggiornare il conteggio nella navbar se presente
+                        updateNavbarCounter();
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante la marcatura della notifica come letta.');
+                });
+            }
+
+            // Funzione per marcare tutte le notifiche come lette
+            function markAllAsReadWithForm(url, formData) {
+                fetch(url, {
+                    method: 'POST',
+                    body: formData,
+                    credentials: 'same-origin'
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Errore nel server');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Rimuovi tutte le classi unread
+                        document.querySelectorAll('.notifications-page-item--unread').forEach(item => {
+                            item.classList.remove('notifications-page-item--unread');
+                        });
+
+                        // Rimuovi tutti i form con pulsanti
+                        document.querySelectorAll('.mark-as-read-btn').forEach(button => {
+                            const form = button.closest('form');
+                            if (form) form.remove();
+                        });
+
+                        // Nascondi il pulsante segna tutte come lette
+                        const form = document.getElementById('markAllAsReadForm');
+                        if (form) {
+                            form.style.display = 'none';
+                        }
+
+                        // Aggiornare il conteggio nella navbar se presente
+                        updateNavbarCounter();
+                    }
+                })
+                .catch(error => {
+                    console.error('Errore:', error);
+                    alert('Si è verificato un errore durante la marcatura di tutte le notifiche come lette.');
+                });
+            }
+
+            // Aggiorna il conteggio delle notifiche nella navbar se presente
+            function updateNavbarCounter() {
+                // Il badge sta dentro il link .notification-link ed è un elemento con classe 'badge'
+                const navbarBadge = document.querySelector('.notification-link .badge.rounded-pill');
+                // Se tutte le notifiche sono state lette, rimuovi il badge
+                const unreadCount = document.querySelectorAll('.notifications-page-item--unread').length;
+
+                // Se non c'è badge e ci sono notifiche non lette, ricarica la pagina per mostrarlo
+                if (!navbarBadge && unreadCount > 0) {
+                    window.location.reload();
+                    return;
+                }
+
+                // Se c'è il badge, aggiornalo
+                if (navbarBadge) {
+                    if (unreadCount > 0) {
+                        // Aggiorna il testo con il conteggio aggiornato
+                        navbarBadge.textContent = unreadCount;
+                        navbarBadge.style.display = '';
+                    } else {
+                        // Se non ci sono notifiche non lette, nascondi il badge completamente
+                        navbarBadge.remove();
+
+                        // Se siamo nella pagina delle notifiche non lette, ricarica la pagina
+                        if (window.location.href.includes('filter=unread')) {
+                            window.location.reload();
+                        }
+                    }
+                }
+
+                // Aggiorna anche la UI della pagina corrente
+                if (window.location.href.includes('filter=unread') && unreadCount === 0) {
+                    // Se tutte le notifiche sono state lette in questa vista, mostra messaggio vuoto
+                    const container = document.querySelector('.notifications-page__list');
+                    if (container) {
+                        container.innerHTML = `
+                            <div class="notifications-page__empty-state">
+                                <i class="fas fa-bell-slash fa-3x text-muted mb-3"></i>
+                                <h4>Nessuna notifica non letta</h4>
+                                <p class="text-muted">Non hai notifiche da visualizzare</p>
+                            </div>
+                        `;
+                    }
+
+                    // Nascondi anche il pulsante "Segna tutte come lette"
+                    const markAllBtn = document.getElementById('markAllAsReadBtn');
+                    if (markAllBtn && markAllBtn.closest('form')) {
+                        markAllBtn.closest('form').style.display = 'none';
+                    }
                 }
             }
         });

@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Gestione Documenti</h2>
@@ -29,7 +32,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="col-md-4 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary me-2">Filtra</button>
                         <a href="{{ route('admin.documents.index') }}" class="btn btn-secondary">Reset</a>
@@ -94,7 +97,7 @@
                                                     <i class="fas fa-trash"></i>
                                                 </button>
                                             </div>
-                                            
+
                                             <!-- Modal di conferma eliminazione -->
                                             <div class="modal fade" id="deleteModal{{ $document->id }}" tabindex="-1" aria-labelledby="deleteModalLabel{{ $document->id }}" aria-hidden="true">
                                                 <div class="modal-dialog">
@@ -123,7 +126,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div class="d-flex justify-content-center mt-4">
                         {{ $documents->links() }}
                     </div>

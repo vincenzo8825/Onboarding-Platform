@@ -23,7 +23,7 @@ class EmployeeController extends Controller
 
     public function create()
     {
-        $roles = Role::whereIn('name', ['employee', 'new_hire'])->get();
+        $roles = Role::all();
         $departments = Department::all();
 
         return view('admin.employees.create', compact('roles', 'departments'));
@@ -52,6 +52,14 @@ class EmployeeController extends Controller
         $user->position = $validated['position'] ?? null;
         $user->hire_date = $validated['hire_date'] ?? null;
         $user->status = $validated['status'];
+
+        // Controlla se l'utente avrà il ruolo di admin
+        $roleIds = $request->roles;
+        $adminRoleId = Role::where('name', 'admin')->value('id');
+        $isAdmin = in_array($adminRoleId, $roleIds);
+
+        // Se è un admin, lo approviamo automaticamente
+        $user->is_approved = $isAdmin ? true : false;
 
         if ($request->hasFile('photo')) {
             $path = $request->file('photo')->store('profile-photos', 'public');
@@ -96,7 +104,7 @@ class EmployeeController extends Controller
 
     public function edit(User $employee)
     {
-        $roles = Role::whereIn('name', ['employee', 'new_hire'])->get();
+        $roles = Role::all();
         $departments = Department::all();
 
         $employee->load('roles');
@@ -131,6 +139,16 @@ class EmployeeController extends Controller
         $employee->hire_date = $validated['hire_date'] ?? null;
         $employee->status = $validated['status'];
 
+        // Controlla se l'utente avrà il ruolo di admin
+        $roleIds = $request->roles;
+        $adminRoleId = Role::where('name', 'admin')->value('id');
+        $isAdmin = in_array($adminRoleId, $roleIds);
+
+        // Se è un admin, lo approviamo automaticamente
+        if ($isAdmin) {
+            $employee->is_approved = true;
+        }
+
         if ($request->hasFile('photo')) {
             // Delete old photo if exists
             if ($employee->photo) {
@@ -161,5 +179,51 @@ class EmployeeController extends Controller
 
         return redirect()->route('admin.employees.index')
             ->with('success', 'Dipendente eliminato con successo!');
+    }
+
+    /**
+     * Mostra gli utenti in attesa di approvazione
+     */
+    public function pendingApproval()
+    {
+        $pendingUsers = User::where('is_approved', false)
+            ->with('roles', 'department')
+            ->paginate(10);
+
+        return view('admin.employees.pending-approval', compact('pendingUsers'));
+    }
+
+    /**
+     * Approva un utente
+     */
+    public function approve(User $employee)
+    {
+        $employee->is_approved = true;
+        $employee->save();
+
+        // Invia email di notifica all'utente
+        // $employee->notify(new UserApproved());
+
+        return redirect()->route('direct.pending-approval')
+            ->with('success', 'Utente approvato con successo!');
+    }
+
+    /**
+     * Rifiuta un utente
+     */
+    public function reject(User $employee, Request $request)
+    {
+        $request->validate([
+            'rejection_reason' => 'nullable|string|max:255'
+        ]);
+
+        // Opzionalmente, invia email con motivo del rifiuto
+        // $employee->notify(new UserRejected($request->rejection_reason));
+
+        // Elimina l'utente o imposta un flag "rejected"
+        $employee->delete();
+
+        return redirect()->route('direct.pending-approval')
+            ->with('success', 'Utente rifiutato con successo!');
     }
 }

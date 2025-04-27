@@ -4,12 +4,15 @@
 @endphp
 
 <x-layout>
+    <x-slot name="styles">
+        @vite('resources/css/pages/employee.css')
+    </x-slot>
     <x-slot name="sidebar">
         @include('components.sidebar')
     </x-slot>
 
-    <div class="container-fluid py-4">
-        <h1 class="mb-4">Dashboard Dipendente</h1>
+    <div class="employee-dashboard container-fluid py-4">
+        <h1 class="employee-dashboard__title mb-4">Dashboard Dipendente</h1>
 
         @if (session('status'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -19,569 +22,475 @@
         @endif
 
         <!-- Notifiche -->
-        @if (count(auth()->user()->unreadNotifications) > 0)
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center bg-primary text-white">
-                <h5 class="m-0 font-weight-bold">Notifiche recenti</h5>
-                <a href="#" id="mark-all-read" class="text-white">
-                    <i class="fas fa-check-double"></i> Segna tutte come lette
-                </a>
-            </div>
-            <div class="card-body p-0">
-                <div class="list-group list-group-flush">
-                    @foreach(auth()->user()->unreadNotifications as $notification)
-                        <div class="list-group-item notification-item" data-id="{{ $notification->id }}">
-                            <div class="d-flex w-100 justify-content-between">
-                                <h6 class="mb-1 font-weight-bold">
-                                    @if (isset($notification->data['checklist_name']))
-                                        <i class="fas fa-clipboard-list text-primary me-2"></i>
-                                    @elseif (isset($notification->data['document_type']))
-                                        <i class="fas fa-file-alt text-warning me-2"></i>
-                                    @elseif (isset($notification->data['ticket_id']))
-                                        <i class="fas fa-ticket-alt text-info me-2"></i>
-                                    @else
-                                        <i class="fas fa-bell text-secondary me-2"></i>
-                                    @endif
-                                    {{ $notification->data['message'] ?? 'Nuova notifica' }}
-                                </h6>
-                                <small class="text-muted">{{ $notification->created_at->diffForHumans() }}</small>
-                            </div>
-                            @if (isset($notification->data['url']))
-                                <a href="{{ $notification->data['url'] }}" class="btn btn-sm btn-outline-primary mt-2 mark-as-read" data-id="{{ $notification->id }}">
-                                    Visualizza dettagli
-                                </a>
-                            @endif
-                        </div>
-                    @endforeach
+        <div class="employee-dashboard__section mb-4">
+            <div class="employee-dashboard__notification-panel">
+                <div class="employee-dashboard__notification-header">
+                    <h2 class="employee-dashboard__section-title">
+                        <i class="fas fa-bell"></i> Notifiche
+                    </h2>
+                    <span class="employee-dashboard__notification-badge">{{ count($notifications) }}</span>
                 </div>
+
+                <div class="employee-dashboard__notification-list">
+                    @forelse($notifications as $notification)
+                        <div class="employee-dashboard__notification-item {{ $notification->read_at ? 'employee-dashboard__notification-item--read' : '' }}">
+                            <div class="employee-dashboard__notification-icon">
+                                @if($notification->type == 'App\Notifications\NewCourseAssigned')
+                                    <i class="fas fa-graduation-cap"></i>
+                                @elseif($notification->type == 'App\Notifications\NewTaskAssigned')
+                                    <i class="fas fa-tasks"></i>
+                                @elseif($notification->type == 'App\Notifications\DocumentRequested')
+                                    <i class="fas fa-file-alt"></i>
+                                @elseif($notification->type == 'App\Notifications\EventReminder')
+                                    <i class="fas fa-calendar-alt"></i>
+                                @else
+                                    <i class="fas fa-info-circle"></i>
+                                @endif
+                            </div>
+
+                            <div class="employee-dashboard__notification-content">
+                                <h3 class="employee-dashboard__notification-title">{{ $notification->data['title'] }}</h3>
+                                <p class="employee-dashboard__notification-message">{{ $notification->data['message'] }}</p>
+                                <span class="employee-dashboard__notification-time">{{ $notification->created_at->diffForHumans() }}</span>
+                            </div>
+
+                            <div class="employee-dashboard__notification-actions">
+                                @if(!$notification->read_at)
+                                    <form action="{{ route('notifications.mark-as-read', $notification->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit" class="employee-dashboard__notification-button">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
+                        </div>
+                    @empty
+                        <div class="employee-dashboard__empty-state">
+                            <i class="fas fa-bell-slash employee-dashboard__empty-state-icon"></i>
+                            <p class="employee-dashboard__empty-state-message">Non hai notifiche non lette</p>
+                        </div>
+                    @endforelse
+                </div>
+
+                @if(count($notifications) > 0)
+                    <div class="employee-dashboard__notification-footer">
+                        <a href="{{ route('notifications.index') }}" class="employee-dashboard__view-all">
+                            Vedi tutte le notifiche <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
-        @endif
 
         <!-- Stato Onboarding -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                <h5 class="m-0 font-weight-bold">Il tuo percorso di onboarding</h5>
-                <span class="badge bg-primary py-2 px-3">{{ $onboardingPercentage ?? 0 }}% Completato</span>
-            </div>
-            <div class="card-body">
-                <div class="progress mb-3" style="height: 25px;">
-                    <div class="progress-bar bg-success" role="progressbar" style="width: {{ $onboardingPercentage ?? 0 }}%"
-                         aria-valuenow="{{ $onboardingPercentage ?? 0 }}" aria-valuemin="0" aria-valuemax="100">
-                        {{ $onboardingPercentage ?? 0 }}%
+        <div class="employee-dashboard__section mb-4">
+            <div class="employee-dashboard__progress-panel">
+                <h2 class="employee-dashboard__section-title">
+                    <i class="fas fa-rocket"></i> Il tuo percorso di Onboarding
+                </h2>
+
+                @php
+                    $totalSteps = $myTotalCourses + $myTotalTasks + $documentsSubmitted;
+                    $completedSteps = $myCoursesCompleted + $myTasksCompleted + $documentsApproved;
+                    $progressPercentage = $totalSteps > 0 ? round(($completedSteps / $totalSteps) * 100) : 0;
+                @endphp
+
+                <div class="employee-dashboard__progress-container">
+                    <div class="employee-dashboard__progress-info">
+                        <h3 class="employee-dashboard__progress-title">Progresso Complessivo</h3>
+                        <span class="employee-dashboard__progress-percentage">{{ $progressPercentage }}%</span>
+                    </div>
+
+                    <div class="employee-dashboard__progress-bar">
+                        <div class="employee-dashboard__progress-fill" style="width: {{ $progressPercentage }}%"></div>
+                    </div>
+
+                    <div class="employee-dashboard__progress-stats">
+                        <div class="employee-dashboard__progress-stat">
+                            <i class="fas fa-graduation-cap employee-dashboard__progress-stat-icon"></i>
+                            <span class="employee-dashboard__progress-stat-value">{{ $myCoursesCompleted }}/{{ $myTotalCourses }}</span>
+                            <span class="employee-dashboard__progress-stat-label">Corsi</span>
+                        </div>
+
+                        <div class="employee-dashboard__progress-stat">
+                            <i class="fas fa-tasks employee-dashboard__progress-stat-icon"></i>
+                            <span class="employee-dashboard__progress-stat-value">{{ $myTasksCompleted }}/{{ $myTotalTasks }}</span>
+                            <span class="employee-dashboard__progress-stat-label">Task</span>
+                        </div>
+
+                        <div class="employee-dashboard__progress-stat">
+                            <i class="fas fa-file-alt employee-dashboard__progress-stat-icon"></i>
+                            <span class="employee-dashboard__progress-stat-value">{{ $documentsApproved }}/{{ $documentsSubmitted }}</span>
+                            <span class="employee-dashboard__progress-stat-label">Documenti</span>
+                        </div>
                     </div>
                 </div>
 
-                <div class="row text-center mt-4">
-                    <div class="col-md-3 mb-3">
-                        <div class="p-3 border rounded">
-                            <h3 class="text-primary mb-0">{{ $myTasksCompleted ?? 0 }} / {{ $myTotalTasks ?? 0 }}</h3>
-                            <p class="mb-0 text-muted">Attività Completate</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="p-3 border rounded">
-                            <h3 class="text-info mb-0">{{ $myCoursesCompleted ?? 0 }} / {{ $myTotalCourses ?? 0 }}</h3>
-                            <p class="mb-0 text-muted">Corsi Completati</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="p-3 border rounded">
-                            <h3 class="text-success mb-0">{{ $documentsApproved ?? 0 }} / {{ $documentsSubmitted ?? 0 }}</h3>
-                            <p class="mb-0 text-muted">Documenti Approvati</p>
-                        </div>
-                    </div>
-                    <div class="col-md-3 mb-3">
-                        <div class="p-3 border rounded">
-                            <h3 class="text-warning mb-0">{{ $daysAtCompany ?? 0 }}</h3>
-                            <p class="mb-0 text-muted">Giorni in Azienda</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+                <div class="employee-dashboard__progress-next">
+                    <h3 class="employee-dashboard__progress-next-title">Prossimi passi consigliati</h3>
 
-        <div class="row">
-            <!-- Checklist e Task -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold">Le tue Attività</h5>
-                        <a href="{{ route('employee.checklists.index') }}" class="btn btn-sm btn-primary">Visualizza Tutte</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
-                            @forelse($checklistItems ?? [] as $item)
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <div class="custom-control custom-checkbox">
-                                            <input type="checkbox" class="form-check-input task-checkbox" id="task-{{ $item->id }}"
-                                                   {{ $item->status === 'completed' ? 'checked' : '' }}
-                                                   data-id="{{ $item->id }}" data-action="update-task-status">
-                                            <label class="form-check-label {{ $item->status === 'completed' ? 'text-decoration-line-through' : '' }}"
-                                                   for="task-{{ $item->id }}">
-                                                {{ $item->text }}
-                                            </label>
-                                        </div>
-                                        @if($item->due_date)
-                                            <span class="badge {{ \Carbon\Carbon::parse($item->due_date)->isPast() ? 'bg-danger' : 'bg-info' }}">
-                                                {{ \Carbon\Carbon::parse($item->due_date)->format('d/m/Y') }}
-                                            </span>
-                                        @endif
-                                    </div>
-                                    @if($item->description)
-                                        <p class="text-muted small mb-0 mt-1">{{ Str::limit($item->description, 100) }}</p>
-                                    @endif
-                                </div>
-                            @empty
-                                <div class="text-center py-4">
-                                    <i class="fas fa-clipboard-check fa-3x text-muted mb-3"></i>
-                                    <h6>Nessuna attività da completare</h6>
-                                    <p class="text-muted mb-0">Tutte le attività sono state completate</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Corsi e Formazione -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold">I tuoi Corsi Formativi</h5>
-                        <a href="{{ route('employee.courses.index') }}" class="btn btn-sm btn-primary">Visualizza Tutti</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
-                            @forelse($courses ?? [] as $course)
-                                <div class="list-group-item">
-                                    <div class="d-flex justify-content-between align-items-center mb-1">
-                                        <h6 class="mb-0">{{ $course->title }}</h6>
-                                        <span class="badge {{ $course->pivot->status === 'completed' ? 'bg-success' : ($course->pivot->status === 'in_progress' ? 'bg-warning' : 'bg-secondary') }}">
-                                            {{ $course->pivot->status === 'completed' ? 'Completato' : ($course->pivot->status === 'in_progress' ? 'In corso' : 'Non iniziato') }}
-                                        </span>
-                                    </div>
-                                    <p class="text-muted small mb-2">{{ Str::limit($course->description, 100) }}</p>
-                                    <div class="d-flex justify-content-between">
-                                        <small class="text-muted">{{ $course->duration_minutes }} min</small>
-                                        <a href="{{ route('employee.courses.show', $course) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="fas fa-play-circle me-1"></i> {{ $course->pivot->status === 'completed' ? 'Rivedi' : 'Inizia' }}
-                                        </a>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="text-center py-4">
-                                    <i class="fas fa-graduation-cap fa-3x text-muted mb-3"></i>
-                                    <h6>Nessun corso disponibile</h6>
-                                    <p class="text-muted mb-0">Non hai corsi assegnati</p>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <div class="row">
-            <!-- Documenti -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold">Documenti</h5>
-                        <a href="{{ route('employee.documents.index') }}" class="btn btn-sm btn-primary">Gestisci Documenti</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-left-primary h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
-                                                    Documenti da Caricare
-                                                </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $documentsTodo ?? 0 }}</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-upload fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                    @if($nextCourse)
+                        <div class="employee-dashboard__next-item">
+                            <div class="employee-dashboard__next-item-icon">
+                                <i class="fas fa-graduation-cap"></i>
                             </div>
-                            <div class="col-md-6 mb-3">
-                                <div class="card border-left-success h-100 py-2">
-                                    <div class="card-body">
-                                        <div class="row no-gutters align-items-center">
-                                            <div class="col mr-2">
-                                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">
-                                                    Documenti Approvati
-                                                </div>
-                                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ $documentsApproved ?? 0 }}</div>
-                                            </div>
-                                            <div class="col-auto">
-                                                <i class="fas fa-check-circle fa-2x text-gray-300"></i>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="employee-dashboard__next-item-content">
+                                <h4 class="employee-dashboard__next-item-title">{{ $nextCourse->title }}</h4>
+                                <p class="employee-dashboard__next-item-description">{{ Str::limit($nextCourse->description, 100) }}</p>
                             </div>
+                            <a href="{{ route('employee.courses.show', $nextCourse) }}" class="employee-dashboard__next-item-action btn btn-primary">
+                                Inizia
+                            </a>
                         </div>
-
-                        <div class="table-responsive mt-3">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Data Caricamento</th>
-                                        <th>Stato</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($documents ?? [] as $document)
-                                        <tr>
-                                            <td>{{ $document->name }}</td>
-                                            <td>{{ $document->created_at->format('d/m/Y') }}</td>
-                                            <td>
-                                                <span class="badge {{ $document->status === 'approved' ? 'bg-success' : ($document->status === 'rejected' ? 'bg-danger' : 'bg-warning') }}">
-                                                    {{ $document->status === 'approved' ? 'Approvato' : ($document->status === 'rejected' ? 'Rifiutato' : 'In revisione') }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <a href="{{ route('employee.documents.show', $document) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="4" class="text-center">Nessun documento caricato</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Supporto e Ticket -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold">Supporto</h5>
-                        <div>
-                            <button type="button" class="btn btn-sm btn-success" data-bs-toggle="modal" data-bs-target="#newTicketModal">
-                                <i class="fas fa-plus me-1"></i> Nuovo Ticket
-                            </button>
-                            <a href="{{ route('employee.tickets.index') }}" class="btn btn-sm btn-primary">Tutti i Ticket</a>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-sm">
-                                <thead>
-                                    <tr>
-                                        <th>Oggetto</th>
-                                        <th>Data</th>
-                                        <th>Stato</th>
-                                        <th>Ultima Risposta</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($tickets ?? [] as $ticket)
-                                        <tr>
-                                            <td>{{ Str::limit($ticket->subject, 30) }}</td>
-                                            <td>{{ $ticket->created_at->format('d/m/Y') }}</td>
-                                            <td>
-                                                <span class="badge {{ $ticket->status === 'open' ? 'bg-danger' : ($ticket->status === 'in_progress' ? 'bg-warning' : 'bg-success') }}">
-                                                    {{ $ticket->status === 'open' ? 'Aperto' : ($ticket->status === 'in_progress' ? 'In lavorazione' : 'Risolto') }}
-                                                </span>
-                                            </td>
-                                            <td>{{ $ticket->updated_at->diffForHumans() }}</td>
-                                            <td>
-                                                <a href="{{ route('employee.tickets.show', $ticket) }}" class="btn btn-sm btn-info">
-                                                    <i class="fas fa-eye"></i>
-                                                </a>
-                                            </td>
-                                        </tr>
-                                    @empty
-                                        <tr>
-                                            <td colspan="5" class="text-center">Nessun ticket aperto</td>
-                                        </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Eventi e Calendario -->
-        <div class="row mb-4">
-            <div class="col-lg-12">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h5 class="m-0 font-weight-bold">Prossimi Eventi</h5>
-                        <a href="{{ route('employee.events.index') }}" class="btn btn-sm btn-primary">Visualizza Calendario</a>
-                    </div>
-                    <div class="card-body">
-                        <div class="row">
-                            @forelse($events ?? [] as $event)
-                                <div class="col-md-4 mb-3">
-                                    <div class="card border-left-info h-100">
-                                        <div class="card-body">
-                                            <div class="d-flex justify-content-between align-items-center mb-2">
-                                                <h6 class="mb-0">{{ $event->title }}</h6>
-                                                <span class="badge bg-info">{{ $event->type }}</span>
-                                            </div>
-                                            <p class="text-muted small">{{ Str::limit($event->description, 80) }}</p>
-                                            <div class="d-flex justify-content-between align-items-center mt-3">
-                                                <small class="text-muted">
-                                                    <i class="far fa-calendar-alt me-1"></i> {{ \Carbon\Carbon::parse($event->start_date)->format('d/m/Y H:i') }}
-                                                </small>
-                                                <div>
-                                                    @php
-                                                        $participantStatus = DB::table('event_participants')
-                                                            ->where('event_id', $event->id)
-                                                            ->where('user_id', Auth::id())
-                                                            ->value('status');
-                                                    @endphp
-
-                                                    @if($participantStatus === 'invited')
-                                                        <span class="badge bg-warning me-2">Invitato</span>
-                                                    @elseif($participantStatus === 'confirmed')
-                                                        <span class="badge bg-success me-2">Confermato</span>
-                                                    @endif
-
-                                                    <a href="{{ route('employee.events.show', $event) }}" class="btn btn-sm btn-outline-info">
-                                                        <i class="fas fa-eye me-1"></i> Dettagli
-                                                    </a>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            @empty
-                                <div class="col-12">
-                                    <div class="text-center py-4">
-                                        <i class="far fa-calendar-alt fa-3x text-muted mb-3"></i>
-                                        <h6>Nessun evento in programma</h6>
-                                        <p class="text-muted mb-0">Non hai eventi pianificati</p>
-                                    </div>
-                                </div>
-                            @endforelse
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Aggiungo il riquadro per le richieste di documenti -->
-        <div class="col-md-6 mb-4">
-            <div class="card h-100">
-                <div class="card-header bg-primary text-white">
-                    <h5 class="mb-0">Richieste Documenti</h5>
-                </div>
-                <div class="card-body">
-                    @php
-                        $pendingRequests = \App\Models\DocumentRequest::where('employee_id', Auth::id())
-                            ->where('status', 'pending')
-                            ->latest()
-                            ->take(5)
-                            ->get();
-                    @endphp
-
-                    @if($pendingRequests->count() > 0)
-                        <div class="list-group">
-                            @foreach($pendingRequests as $request)
-                                <a href="{{ route('employee.document-requests.show', $request) }}" class="list-group-item list-group-item-action">
-                                    <div class="d-flex w-100 justify-content-between">
-                                        <h6 class="mb-1">{{ $request->document_type }}</h6>
-                                        <small class="text-muted">{{ $request->created_at->diffForHumans() }}</small>
-                                    </div>
-                                    <p class="mb-1 text-truncate">{{ $request->description ?: 'Nessuna descrizione' }}</p>
-
-                                    @if($request->due_date)
-                                        <small class="text-{{ \Carbon\Carbon::parse($request->due_date)->isPast() ? 'danger' : 'muted' }}">
-                                            Scadenza: {{ \Carbon\Carbon::parse($request->due_date)->format('d/m/Y') }}
-                                        </small>
-                                    @endif
-                                </a>
-                            @endforeach
-                        </div>
-
-                        @if($pendingRequests->count() > 0)
-                            <div class="d-flex justify-content-end mt-3">
-                                <a href="{{ route('employee.document-requests.index') }}" class="btn btn-sm btn-outline-primary">
-                                    Visualizza tutte
-                                </a>
+                    @elseif($nextTask)
+                        <div class="employee-dashboard__next-item">
+                            <div class="employee-dashboard__next-item-icon">
+                                <i class="fas fa-tasks"></i>
                             </div>
-                        @endif
+                            <div class="employee-dashboard__next-item-content">
+                                <h4 class="employee-dashboard__next-item-title">{{ $nextTask->title }}</h4>
+                                <p class="employee-dashboard__next-item-description">{{ Str::limit($nextTask->description, 100) }}</p>
+                            </div>
+                            <a href="{{ route('employee.checklists.show', $nextTask) }}" class="employee-dashboard__next-item-action btn btn-primary">
+                                Visualizza
+                            </a>
+                        </div>
+                    @elseif($nextDocument)
+                        <div class="employee-dashboard__next-item">
+                            <div class="employee-dashboard__next-item-icon">
+                                <i class="fas fa-file-alt"></i>
+                            </div>
+                            <div class="employee-dashboard__next-item-content">
+                                <h4 class="employee-dashboard__next-item-title">{{ $nextDocument->name }}</h4>
+                                <p class="employee-dashboard__next-item-description">{{ Str::limit($nextDocument->description, 100) }}</p>
+                            </div>
+                            <a href="{{ route('employee.documents.show', $nextDocument) }}" class="employee-dashboard__next-item-action btn btn-primary">
+                                Carica
+                            </a>
+                        </div>
                     @else
-                        <div class="text-center py-4">
-                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                            <p>Non ci sono richieste di documenti in attesa.</p>
+                        <div class="employee-dashboard__empty-state">
+                            <i class="fas fa-check-circle employee-dashboard__empty-state-icon"></i>
+                            <p class="employee-dashboard__empty-state-message">Hai completato tutte le attività assegnate!</p>
                         </div>
                     @endif
                 </div>
             </div>
         </div>
-    </div>
 
-    <!-- Modal Nuovo Ticket -->
-    <div class="modal fade" id="newTicketModal" tabindex="-1" aria-labelledby="newTicketModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <form action="{{ route('employee.tickets.store') }}" method="POST">
-                    @csrf
-                    <div class="modal-header">
-                        <h5 class="modal-title" id="newTicketModalLabel">Crea Nuovo Ticket</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <div class="mb-3">
-                            <label for="subject" class="form-label">Oggetto</label>
-                            <input type="text" class="form-control" id="subject" name="subject" required>
+        <div class="row">
+            <!-- Task e Corsi Assegnati -->
+            <div class="col-lg-8">
+                <!-- Task -->
+                <div class="employee-dashboard__section mb-4">
+                    <div class="employee-dashboard__content-panel">
+                        <div class="employee-dashboard__content-header">
+                            <h2 class="employee-dashboard__section-title">
+                                <i class="fas fa-tasks"></i> I tuoi Task
+                            </h2>
+                            <a href="{{ route('employee.checklists.index') }}" class="employee-dashboard__view-all">
+                                Vedi tutti <i class="fas fa-arrow-right"></i>
+                            </a>
                         </div>
-                        <div class="mb-3">
-                            <label for="category" class="form-label">Categoria</label>
-                            <select class="form-select" id="category" name="category" required>
-                                <option value="">Seleziona categoria</option>
-                                <option value="technical">Problemi Tecnici</option>
-                                <option value="administrative">Richieste Amministrative</option>
-                                <option value="onboarding">Processo di Onboarding</option>
-                                <option value="other">Altro</option>
-                            </select>
-                        </div>
-                        <div class="mb-3">
-                            <label for="message" class="form-label">Messaggio</label>
-                            <textarea class="form-control" id="message" name="message" rows="5" required></textarea>
+
+                        <div class="employee-dashboard__content-body">
+                            @forelse($checklistItems as $task)
+                                <div class="employee-dashboard__task-item">
+                                    <div class="employee-dashboard__task-status">
+                                        @if($task->pivot->status == 'completed')
+                                            <i class="fas fa-check-circle employee-dashboard__task-status-icon--completed"></i>
+                                        @elseif($task->pivot->status == 'in_progress')
+                                            <i class="fas fa-spinner employee-dashboard__task-status-icon--progress"></i>
+                                        @else
+                                            <i class="fas fa-clock employee-dashboard__task-status-icon--pending"></i>
+                                        @endif
+                                    </div>
+
+                                    <div class="employee-dashboard__task-info">
+                                        <h3 class="employee-dashboard__task-title">{{ $task->title }}</h3>
+                                        <p class="employee-dashboard__task-description">{{ Str::limit($task->description, 100) }}</p>
+
+                                        <div class="employee-dashboard__task-meta">
+                                            @if($task->due_date)
+                                                <span class="employee-dashboard__task-meta-item">
+                                                    <i class="fas fa-calendar"></i>
+                                                    @if(\Carbon\Carbon::parse($task->due_date)->isPast())
+                                                        <span class="text-danger">Scaduta il {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y') }}</span>
+                                                    @else
+                                                        Scade il {{ \Carbon\Carbon::parse($task->due_date)->format('d/m/Y') }}
+                                                    @endif
+                                                </span>
+                                            @endif
+
+                                            <span class="employee-dashboard__task-meta-item">
+                                                <i class="fas fa-tag"></i> {{ $task->category }}
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="employee-dashboard__task-actions">
+                                        <a href="{{ route('employee.checklists.show', $task) }}" class="employee-dashboard__task-button">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="employee-dashboard__empty-state">
+                                    <i class="fas fa-tasks employee-dashboard__empty-state-icon"></i>
+                                    <p class="employee-dashboard__empty-state-message">Non hai task assegnati</p>
+                                </div>
+                            @endforelse
                         </div>
                     </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                        <button type="submit" class="btn btn-primary">Invia Ticket</button>
+                </div>
+
+                <!-- Corsi -->
+                <div class="employee-dashboard__section mb-4">
+                    <div class="employee-dashboard__content-panel">
+                        <div class="employee-dashboard__content-header">
+                            <h2 class="employee-dashboard__section-title">
+                                <i class="fas fa-graduation-cap"></i> I tuoi Corsi
+                            </h2>
+                            <a href="{{ route('employee.courses.index') }}" class="employee-dashboard__view-all">
+                                Vedi tutti <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="employee-dashboard__content-body">
+                            @forelse($courses as $course)
+                                <div class="employee-dashboard__course-item">
+                                    <div class="employee-dashboard__course-image">
+                                        @if($course->image)
+                                            <img src="{{ asset('storage/' . $course->image) }}" alt="{{ $course->title }}" class="employee-dashboard__course-img">
+                                        @else
+                                            <div class="employee-dashboard__course-img-placeholder">
+                                                <i class="fas fa-book-open"></i>
+                                            </div>
+                                        @endif
+                                    </div>
+
+                                    <div class="employee-dashboard__course-info">
+                                        <h3 class="employee-dashboard__course-title">{{ $course->title }}</h3>
+                                        <p class="employee-dashboard__course-description">{{ Str::limit($course->description, 100) }}</p>
+
+                                        <div class="employee-dashboard__course-progress">
+                                            @php
+                                                $totalLessons = isset($course->lessons) && $course->lessons !== null ? $course->lessons->count() : 0;
+                                                $lessonsCompleted = $totalLessons > 0 && method_exists($course, 'lessonsCompleted')
+                                                    ? $course->lessonsCompleted(auth()->user())
+                                                    : 0;
+                                                $progressPercent = $totalLessons > 0
+                                                    ? round(($lessonsCompleted / $totalLessons) * 100)
+                                                    : 0;
+                                            @endphp
+
+                                            <div class="employee-dashboard__course-progress-info">
+                                                <span class="employee-dashboard__course-progress-text">
+                                                    {{ $lessonsCompleted }}/{{ $totalLessons }} lezioni
+                                                </span>
+                                                <span class="employee-dashboard__course-progress-percent">
+                                                    {{ $progressPercent }}%
+                                                </span>
+                                            </div>
+
+                                            <div class="employee-dashboard__course-progress-bar">
+                                                <div class="employee-dashboard__course-progress-fill" style="width: {{ $progressPercent }}%"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="employee-dashboard__course-actions">
+                                        <a href="{{ route('employee.courses.show', $course) }}" class="btn btn-sm btn-primary">
+                                            @if($progressPercent == 0)
+                                                Inizia
+                                            @elseif($progressPercent == 100)
+                                                Rivedi
+                                            @else
+                                                Continua
+                                            @endif
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="employee-dashboard__empty-state">
+                                    <i class="fas fa-graduation-cap employee-dashboard__empty-state-icon"></i>
+                                    <p class="employee-dashboard__empty-state-message">Non hai corsi assegnati</p>
+                                </div>
+                            @endforelse
+                        </div>
                     </div>
-                </form>
+                </div>
+            </div>
+
+            <!-- Documenti e Eventi -->
+            <div class="col-lg-4">
+                <!-- Documenti -->
+                <div class="employee-dashboard__section mb-4">
+                    <div class="employee-dashboard__content-panel">
+                        <div class="employee-dashboard__content-header">
+                            <h2 class="employee-dashboard__section-title">
+                                <i class="fas fa-file-alt"></i> Documenti
+                            </h2>
+                            <a href="{{ route('employee.documents.index') }}" class="employee-dashboard__view-all">
+                                Vedi tutti <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="employee-dashboard__content-body">
+                            @forelse($documents as $document)
+                                <div class="employee-dashboard__document-item">
+                                    <div class="employee-dashboard__document-icon">
+                                        @php
+                                            $extension = '';
+                                            if (isset($document->pivot) && $document->pivot !== null && isset($document->pivot->file_path)) {
+                                                $extension = $document->pivot->file_path
+                                                    ? pathinfo($document->pivot->file_path, PATHINFO_EXTENSION)
+                                                    : '';
+                                            }
+                                        @endphp
+
+                                        @if(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'pending')
+                                            <i class="fas fa-file employee-dashboard__document-icon--pending"></i>
+                                        @elseif($extension == 'pdf')
+                                            <i class="fas fa-file-pdf employee-dashboard__document-icon--uploaded"></i>
+                                        @elseif(in_array($extension, ['doc', 'docx']))
+                                            <i class="fas fa-file-word employee-dashboard__document-icon--uploaded"></i>
+                                        @elseif(in_array($extension, ['xls', 'xlsx']))
+                                            <i class="fas fa-file-excel employee-dashboard__document-icon--uploaded"></i>
+                                        @elseif(in_array($extension, ['jpg', 'jpeg', 'png', 'gif']))
+                                            <i class="fas fa-file-image employee-dashboard__document-icon--uploaded"></i>
+                                        @else
+                                            <i class="fas fa-file-alt employee-dashboard__document-icon--uploaded"></i>
+                                        @endif
+                                    </div>
+
+                                    <div class="employee-dashboard__document-info">
+                                        <h3 class="employee-dashboard__document-title">{{ $document->name }}</h3>
+
+                                        <div class="employee-dashboard__document-meta">
+                                            <span class="employee-dashboard__document-status">
+                                                @if(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'pending')
+                                                    <span class="badge bg-warning">Da caricare</span>
+                                                @elseif(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'uploaded')
+                                                    <span class="badge bg-info">Caricato</span>
+                                                @elseif(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'approved')
+                                                    <span class="badge bg-success">Approvato</span>
+                                                @elseif(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'rejected')
+                                                    <span class="badge bg-danger">Rifiutato</span>
+                                                @endif
+                                            </span>
+
+                                            @if(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->file_path) && $document->pivot->file_path)
+                                                <span class="employee-dashboard__document-date">
+                                                    <i class="fas fa-calendar"></i>
+                                                    {{ isset($document->pivot->updated_at) ? \Carbon\Carbon::parse($document->pivot->updated_at)->format('d/m/Y') : '' }}
+                                                </span>
+                                            @endif
+                                        </div>
+                                    </div>
+
+                                    <div class="employee-dashboard__document-actions">
+                                        <a href="{{ route('employee.documents.show', $document) }}" class="employee-dashboard__document-button">
+                                            @if(isset($document->pivot) && $document->pivot !== null && isset($document->pivot->status) && $document->pivot->status == 'pending')
+                                                <i class="fas fa-upload"></i>
+                                            @else
+                                                <i class="fas fa-eye"></i>
+                                            @endif
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="employee-dashboard__empty-state">
+                                    <i class="fas fa-file-alt employee-dashboard__empty-state-icon"></i>
+                                    <p class="employee-dashboard__empty-state-message">Non hai documenti richiesti</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Eventi -->
+                <div class="employee-dashboard__section mb-4">
+                    <div class="employee-dashboard__content-panel">
+                        <div class="employee-dashboard__content-header">
+                            <h2 class="employee-dashboard__section-title">
+                                <i class="fas fa-calendar-alt"></i> Prossimi Eventi
+                            </h2>
+                            <a href="{{ route('employee.events.index') }}" class="employee-dashboard__view-all">
+                                Vedi tutti <i class="fas fa-arrow-right"></i>
+                            </a>
+                        </div>
+
+                        <div class="employee-dashboard__content-body">
+                            @forelse($upcomingEvents as $event)
+                                <div class="employee-dashboard__event-item">
+                                    <div class="employee-dashboard__event-date">
+                                        <span class="employee-dashboard__event-date-day">
+                                            {{ \Carbon\Carbon::parse($event->start_date)->format('d') }}
+                                        </span>
+                                        <span class="employee-dashboard__event-date-month">
+                                            {{ \Carbon\Carbon::parse($event->start_date)->format('M') }}
+                                        </span>
+                                    </div>
+
+                                    <div class="employee-dashboard__event-info">
+                                        <h3 class="employee-dashboard__event-title">{{ $event->title }}</h3>
+                                        <p class="employee-dashboard__event-description">{{ Str::limit($event->description, 80) }}</p>
+
+                                        <div class="employee-dashboard__event-meta">
+                                            <span class="employee-dashboard__event-meta-item">
+                                                <i class="fas fa-clock"></i>
+                                                {{ \Carbon\Carbon::parse($event->start_date)->format('H:i') }} -
+                                                {{ \Carbon\Carbon::parse($event->end_date)->format('H:i') }}
+                                            </span>
+
+                                            <span class="employee-dashboard__event-meta-item">
+                                                @if($event->is_online)
+                                                    <i class="fas fa-video"></i> Evento online
+                                                @else
+                                                    <i class="fas fa-map-marker-alt"></i> {{ $event->location }}
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="employee-dashboard__event-actions">
+                                        <a href="{{ route('employee.events.show', $event) }}" class="btn btn-sm btn-outline-primary">
+                                            Dettagli
+                                        </a>
+                                    </div>
+                                </div>
+                            @empty
+                                <div class="employee-dashboard__empty-state">
+                                    <i class="fas fa-calendar-times employee-dashboard__empty-state-icon"></i>
+                                    <p class="employee-dashboard__empty-state-message">Non ci sono eventi programmati</p>
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Supporto -->
+                <div class="employee-dashboard__section">
+                    <div class="employee-dashboard__support-panel">
+                        <h2 class="employee-dashboard__section-title">
+                            <i class="fas fa-question-circle"></i> Hai bisogno di aiuto?
+                        </h2>
+                        <p class="employee-dashboard__support-text">
+                            Se hai domande o problemi durante il tuo percorso di onboarding, non esitare a contattare il team di supporto.
+                        </p>
+                        <div class="employee-dashboard__support-actions">
+                            <a href="{{ route('employee.tickets.create') }}" class="btn btn-primary">
+                                <i class="fas fa-ticket-alt"></i> Apri un Ticket
+                            </a>
+                            <a href="{{ route('employee.support') }}" class="btn btn-outline-secondary">
+                                <i class="fas fa-info-circle"></i> FAQ
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
-
-    @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Gestione checkbox task
-            document.querySelectorAll('.task-checkbox').forEach(function(checkbox) {
-                checkbox.addEventListener('change', function() {
-                    const taskId = this.dataset.id;
-                    const status = this.checked ? 'completed' : 'pending';
-                    const label = this.nextElementSibling;
-
-                    if (this.checked) {
-                        label.classList.add('text-decoration-line-through');
-                    } else {
-                        label.classList.remove('text-decoration-line-through');
-                    }
-
-                    // Invia lo stato aggiornato al server
-                    fetch(`/employee/checklist-items/${taskId}/update-status`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                        },
-                        body: JSON.stringify({ status: status })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            // Aggiorna l'interfaccia utente se necessario
-                        }
-                    })
-                    .catch(error => console.error('Errore:', error));
-                });
-            });
-
-            // Gestione mark-as-read per singole notifiche
-            const markAsReadButtons = document.querySelectorAll('.mark-as-read');
-            markAsReadButtons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    const notificationId = this.getAttribute('data-id');
-                    markAsRead(notificationId);
-                });
-            });
-
-            // Gestione mark-all-read
-            const markAllReadButton = document.getElementById('mark-all-read');
-            if (markAllReadButton) {
-                markAllReadButton.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    markAllAsRead();
-                });
-            }
-
-            // Funzione per marcare una notifica come letta
-            function markAsRead(id) {
-                fetch(`/notifications/${id}/mark-as-read`, {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const notificationItem = document.querySelector(`.notification-item[data-id="${id}"]`);
-                        if (notificationItem) {
-                            notificationItem.classList.add('bg-light');
-                            setTimeout(() => {
-                                notificationItem.remove();
-
-                                // Se non ci sono più notifiche, nascondi il container
-                                const notificationItems = document.querySelectorAll('.notification-item');
-                                if (notificationItems.length === 0) {
-                                    const notificationContainer = document.querySelector('.card.shadow.mb-4');
-                                    if (notificationContainer) {
-                                        notificationContainer.remove();
-                                    }
-                                }
-                            }, 500);
-                        }
-                    }
-                });
-            }
-
-            // Funzione per marcare tutte le notifiche come lette
-            function markAllAsRead() {
-                fetch('/notifications/mark-all-as-read', {
-                    method: 'POST',
-                    headers: {
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    }
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        const notificationContainer = document.querySelector('.card.shadow.mb-4');
-                        if (notificationContainer) {
-                            notificationContainer.classList.add('fade-out');
-                            setTimeout(() => {
-                                notificationContainer.remove();
-                            }, 500);
-                        }
-                    }
-                });
-            }
-        });
-    </script>
-    @endpush
 </x-layout>

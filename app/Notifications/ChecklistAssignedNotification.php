@@ -2,8 +2,8 @@
 
 namespace App\Notifications;
 
-use App\Models\Checklist;
 use App\Models\User;
+use App\Models\Checklist;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
@@ -18,14 +18,14 @@ class ChecklistAssignedNotification extends Notification implements ShouldQueue
      *
      * @var \App\Models\Checklist
      */
-    protected $checklist;
+    protected Checklist $checklist;
 
     /**
      * L'utente admin che ha assegnato la checklist.
      *
      * @var \App\Models\User
      */
-    protected $admin;
+    protected User $admin;
 
     /**
      * Create a new notification instance.
@@ -48,7 +48,7 @@ class ChecklistAssignedNotification extends Notification implements ShouldQueue
      */
     public function via($notifiable)
     {
-        return ['mail', 'database'];
+        return ['database'];
     }
 
     /**
@@ -59,15 +59,14 @@ class ChecklistAssignedNotification extends Notification implements ShouldQueue
      */
     public function toMail($notifiable)
     {
-        $url = route('employee.checklists.show', $this->checklist->id);
-
         return (new MailMessage)
             ->subject('Nuova checklist assegnata')
-            ->greeting('Ciao ' . $notifiable->name . ',')
-            ->line('Ti è stata assegnata una nuova checklist: "' . $this->checklist->name . '".')
-            ->line($this->checklist->description)
-            ->action('Visualizza checklist', $url)
-            ->line('Completala il prima possibile per procedere con il tuo onboarding.');
+            ->greeting('Ciao ' . $notifiable->name . '!')
+            ->line('Ti è stata assegnata una nuova checklist da completare.')
+            ->line('Titolo: ' . $this->checklist->title)
+            ->line('Assegnata da: ' . $this->admin->name)
+            ->action('Visualizza Checklist', url('/checklists/' . $this->checklist->id))
+            ->line('Ricordati di completare tutte le attività entro la data di scadenza.');
     }
 
     /**
@@ -79,12 +78,14 @@ class ChecklistAssignedNotification extends Notification implements ShouldQueue
     public function toArray($notifiable)
     {
         return [
-            'checklist_id' => $this->checklist->id,
-            'checklist_name' => $this->checklist->name,
+            'title' => 'Nuova checklist assegnata',
+            'message' => 'Ti è stata assegnata la checklist "' . $this->checklist->title . '"',
             'admin_id' => $this->admin->id,
             'admin_name' => $this->admin->name,
-            'message' => 'Ti è stata assegnata una nuova checklist: "' . $this->checklist->name . '".',
-            'url' => route('employee.checklists.show', $this->checklist->id)
+            'checklist_id' => $this->checklist->id,
+            'checklist_title' => $this->checklist->title,
+            'type' => 'checklist',
+            'url' => '/checklists/' . $this->checklist->id
         ];
     }
 }

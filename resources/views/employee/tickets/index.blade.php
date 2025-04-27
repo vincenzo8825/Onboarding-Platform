@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>I miei Ticket</h2>
@@ -77,7 +80,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div class="d-flex justify-content-center mt-4">
                         {{ $tickets->links() }}
                     </div>

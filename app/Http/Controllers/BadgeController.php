@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\BadgeAwarded;
 use App\Models\Badge;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -15,7 +16,7 @@ class BadgeController extends Controller
      */
     public function index()
     {
-        $badges = Badge::all();
+        $badges = Badge::paginate(15);
         return view('admin.badges.index', compact('badges'));
     }
 
@@ -46,6 +47,12 @@ class BadgeController extends Controller
 
         // Aggiungi campi predefiniti che potrebbero non essere nel form
         $data = $validated;
+
+        // Imposta un valore predefinito per il campo description se è null
+        if (!isset($data['description']) || $data['description'] === null) {
+            $data['description'] = '';
+        }
+
         $data['type'] = 'special'; // Default type: 'special' (assegnazione manuale)
         $data['slug'] = Str::slug($data['name']); // Genera uno slug dal nome
         $data['is_active'] = true; // Attiva il badge di default
@@ -109,27 +116,30 @@ class BadgeController extends Controller
     }
 
     /**
-     * Award a badge to a user.
+     * Assegna un badge a un utente
      */
-    public function awardToUser(Request $request, Badge $badge)
+    public function awardBadge(Request $request, Badge $badge)
     {
         $validated = $request->validate([
             'user_id' => 'required|exists:users,id',
         ]);
 
-        $user = User::findOrFail($validated['user_id']);
+        $user = User::find($validated['user_id']);
 
-        // Verifica se l'utente ha già il badge
+        // Verifica se l'utente ha già questo badge
         if (!$user->badges()->where('badge_id', $badge->id)->exists()) {
             $user->badges()->attach($badge->id, [
                 'awarded_at' => now(),
+                'awarded_by' => auth()->id(),
             ]);
 
-            return redirect()->back()
-                ->with('success', "Badge '{$badge->name}' assegnato a {$user->name} con successo.");
+            // Emetti l'evento per la notifica
+            event(new BadgeAwarded($badge, $user, auth()->user()));
+
+            // Invia direttamente la notifica per garantire che funzioni
+            $user->notify(new \App\Notifications\BadgeAwardedNotification($badge, auth()->user()));
         }
 
-        return redirect()->back()
-            ->with('error', "L'utente ha già questo badge.");
+        return redirect()->back()->with('success', 'Badge assegnato con successo');
     }
 }

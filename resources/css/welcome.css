@@ -1,0 +1,33 @@
+
+body.welcome-page {
+  padding-top: 0 !important;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Nunito', sans-serif;
+  background-color: #f8f9fa;
+}
+
+.main-welcome-content {
+  flex: 1 0 auto;
+}
+
+.welcome-page .container-fluid {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.welcome-page .auth-content {
+  padding: 0 !important;
+}
+
+
+.hero {
+  background: linear-gradient(135deg, var(--primary-color) 0%, #4461da 100%);
+  padding: 8rem 0 6rem;
+  position: relative;
+  overflow: hidden;
+
+  margin-top: -1px;
+}
+

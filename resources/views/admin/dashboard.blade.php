@@ -1,111 +1,173 @@
 <x-layout>
+    <x-slot name="styles">
+        @vite('resources/css/pages/admin.css')
+    </x-slot>
     <x-slot name="sidebar">
         @include('components.sidebar')
     </x-slot>
 
-    <div class="container-fluid py-4">
-        <h1 class="mb-4">Dashboard Admin</h1>
+    <div class="admin-dashboard container-fluid py-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="admin-dashboard__title">Dashboard Admin</h1>
+            <div>
+                <a href="{{ route('admin.approvals.index') }}" class="btn btn-primary">
+                    <i class="fas fa-user-check me-1"></i> Gestione Approvazioni
+                    @if($pendingApprovalCount > 0)
+                        <span class="badge bg-danger ms-1">{{ $pendingApprovalCount }}</span>
+                    @endif
+                </a>
+            </div>
+        </div>
 
-            @if (session('status'))
+        @if (session('status'))
             <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    {{ session('status') }}
+                {{ session('status') }}
                 <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        @endif
+
+        <!-- Sezione di benvenuto -->
+        <div class="admin-dashboard__welcome mb-4">
+            <div class="admin-dashboard__welcome-content">
+                <h2 class="admin-dashboard__welcome-title">Benvenuto nella dashboard amministrativa</h2>
+                <p class="admin-dashboard__welcome-text">Da qui puoi gestire tutti gli aspetti della piattaforma di onboarding, monitorare i progressi dei dipendenti e gestire le risorse formative.</p>
+            </div>
+        </div>
+
+        <!-- Se ci sono utenti in attesa di approvazione, mostra un alert -->
+        @if($pendingApprovalCount > 0)
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="card border-left-warning shadow h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">
+                                    Attenzione!</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">
+                                    {{ $pendingApprovalCount }} {{ $pendingApprovalCount == 1 ? 'utente' : 'utenti' }} in attesa di approvazione
+                                </div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-user-clock fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                        <div class="mt-3"></div>
+                            <a href="{{ route('admin.approvals.index') }}" class="btn btn-warning btn-sm">
+                                <i class="fas fa-check-circle me-1"></i> Gestisci approvazioni
+                            </a>
+
+
+                        </div>
+                    </div>
                 </div>
-            @endif
+            </div>
+        </div>
+        @endif
 
         <!-- Panoramica Cards -->
-        <div class="row mb-4">
-            <div class="col-md-3 mb-3">
-                <div class="card h-100 border-left-primary shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Dipendenti</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $employeeCount }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-users fa-2x text-gray-300"></i>
-                            </div>
+        <div class="admin-dashboard__stat-cards">
+            <div class="stat-card border-left-primary">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Dipendenti</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ $employeeCount }}</div>
                         </div>
-                        <a href="{{ route('admin.employees.index') }}" class="btn btn-sm btn-primary mt-3">Gestisci Dipendenti</a>
+                        <div class="col-auto">
+                            <i class="fas fa-users fa-2x text-gray-300"></i>
+                        </div>
                     </div>
+                    <a href="{{ route('admin.employees.index') }}" class="btn btn-sm btn-primary text-nowrap mt-3 w-100">Gestisci Dipendenti</a>
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <div class="card h-100 border-left-success shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Corsi Formativi</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ \App\Models\Course::count() }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
-                            </div>
+            <div class="stat-card border-left-success">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Corsi Formativi</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ \App\Models\Course::count() }}</div>
                         </div>
-                        <a href="{{ route('admin.courses.index') }}" class="btn btn-sm btn-success mt-3">Gestisci Corsi</a>
+                        <div class="col-auto">
+                            <i class="fas fa-graduation-cap fa-2x text-gray-300"></i>
+                        </div>
                     </div>
+                    <a href="{{ route('admin.courses.index') }}" class="btn btn-sm btn-success text-nowrap mt-3 w-100">Gestisci Corsi</a>
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <div class="card h-100 border-left-info shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Ticket Attivi</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ $activeTicketCount }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
-                            </div>
+            <div class="stat-card border-left-info">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Ticket Attivi</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ $activeTicketCount }}</div>
                         </div>
-                        <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-info mt-3">Visualizza Ticket</a>
+                        <div class="col-auto">
+                            <i class="fas fa-ticket-alt fa-2x text-gray-300"></i>
+                        </div>
                     </div>
+                    <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-info text-nowrap mt-3 w-100">Visualizza Ticket</a>
                 </div>
             </div>
 
-            <div class="col-md-3 mb-3">
-                <div class="card h-100 border-left-warning shadow">
-                    <div class="card-body">
-                        <div class="row align-items-center">
-                            <div class="col mr-2">
-                                <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Eventi Programmati</div>
-                                <div class="h5 mb-0 font-weight-bold">{{ \App\Models\Event::where('start_date', '>', now())->count() }}</div>
-                            </div>
-                            <div class="col-auto">
-                                <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
-                            </div>
+            <div class="stat-card border-left-danger">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-danger text-uppercase mb-1">Richieste Documenti</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ \App\Models\DocumentRequest::where('status', 'pending')->count() }}</div>
                         </div>
-                        <a href="{{ route('admin.events.index') }}" class="btn btn-sm btn-warning mt-3">Gestisci Eventi</a>
+                        <div class="col-auto">
+                            <i class="fas fa-file-upload fa-2x text-gray-300"></i>
+                        </div>
                     </div>
+                    <a href="{{ route('admin.document-requests.index') }}" class="btn btn-sm btn-danger text-nowrap mt-3 w-100">Gestisci Richieste</a>
+                </div>
+            </div>
+
+            <div class="stat-card border-left-warning">
+                <div class="card-body">
+                    <div class="row align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Eventi Programmati</div>
+                            <div class="h5 mb-0 font-weight-bold">{{ \App\Models\Event::where('start_date', '>', now())->count() }}</div>
+                        </div>
+                        <div class="col-auto">
+                            <i class="fas fa-calendar-alt fa-2x text-gray-300"></i>
+                        </div>
+                    </div>
+                    <a href="{{ route('admin.events.index') }}" class="btn btn-sm btn-warning text-nowrap mt-3 w-100">Gestisci Eventi</a>
                 </div>
             </div>
         </div>
 
         <!-- Grafici e Statistiche -->
-        <div class="row mb-4">
-            <div class="col-lg-8 mb-4">
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Stato Onboarding Dipendenti</h6>
-                        <div class="dropdown">
-                            <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="periodDropdown" data-bs-toggle="dropdown" aria-expanded="false">
-                                Ultimi 30 giorni
-                            </button>
-                            <ul class="dropdown-menu" aria-labelledby="periodDropdown">
-                                <li><a class="dropdown-item" href="#">Ultimi 7 giorni</a></li>
-                                <li><a class="dropdown-item" href="#">Ultimi 30 giorni</a></li>
-                                <li><a class="dropdown-item" href="#">Ultimi 90 giorni</a></li>
-                            </ul>
+        <div class="admin-dashboard__section">
+            <div class="admin-dashboard__section-header">
+                <h2 class="admin-dashboard__section-title">Analisi e Statistiche</h2>
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-lg-8 mb-4">
+                    <div class="admin-dashboard__chart-container">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h3 class="admin-dashboard__chart-title">
+                                <i class="fas fa-chart-line"></i> Stato Onboarding Dipendenti
+                            </h3>
+                            <div class="admin-dashboard__chart-filters">
+                                <span class="admin-dashboard__chart-filter active" data-period="30">Ultimi 30 giorni</span>
+                                <span class="admin-dashboard__chart-filter" data-period="7">Ultimi 7 giorni</span>
+                                <span class="admin-dashboard__chart-filter" data-period="90">Ultimi 90 giorni</span>
+                            </div>
                         </div>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="onboardingChart" height="300"></canvas>
+                        <div class="chart-container" style="position: relative; height: 300px;">
+                            <canvas id="onboardingChart"></canvas>
+                        </div>
 
                         <div class="mt-4">
-                            <h6 class="font-weight-bold">Stato Onboarding</h6>
+                            <h6 class="fw-bold">Stato Onboarding</h6>
 
                             @php
                                 $allEmployees = \App\Models\User::whereHas('roles', function($q) {
@@ -137,47 +199,41 @@
                                 $completedPercentage = $totalEmployees > 0 ? round(($completed / $totalEmployees) * 100) : 0;
                             @endphp
 
-                            <div class="row text-center">
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3 bg-light">
-                                        <h3 class="text-danger mb-0">{{ $notStarted }}</h3>
-                                        <p class="mb-0">Non iniziati</p>
-                                        <div class="progress mt-2" style="height: 5px;">
-                                            <div class="progress-bar bg-danger" role="progressbar" style="width: {{ $notStartedPercentage }}%" aria-valuenow="{{ $notStartedPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
+                            <div class="admin-dashboard__metric-cards">
+                                <div class="admin-dashboard__metric-card">
+                                    <div class="admin-dashboard__metric-value text-danger">{{ $notStarted }}</div>
+                                    <div class="admin-dashboard__metric-label">Non iniziati</div>
+                                    <div class="admin-dashboard__metric-progress">
+                                        <div class="admin-dashboard__metric-progress-bar bg-danger" style="width: {{ $notStartedPercentage }}%"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3 bg-light">
-                                        <h3 class="text-warning mb-0">{{ $inProgress }}</h3>
-                                        <p class="mb-0">In corso</p>
-                                        <div class="progress mt-2" style="height: 5px;">
-                                            <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $inProgressPercentage }}%" aria-valuenow="{{ $inProgressPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
+                                <div class="admin-dashboard__metric-card">
+                                    <div class="admin-dashboard__metric-value text-warning">{{ $inProgress }}</div>
+                                    <div class="admin-dashboard__metric-label">In corso</div>
+                                    <div class="admin-dashboard__metric-progress">
+                                        <div class="admin-dashboard__metric-progress-bar bg-warning" style="width: {{ $inProgressPercentage }}%"></div>
                                     </div>
                                 </div>
-                                <div class="col-md-4">
-                                    <div class="border rounded p-3 bg-light">
-                                        <h3 class="text-success mb-0">{{ $completed }}</h3>
-                                        <p class="mb-0">Completati</p>
-                                        <div class="progress mt-2" style="height: 5px;">
-                                            <div class="progress-bar bg-success" role="progressbar" style="width: {{ $completedPercentage }}%" aria-valuenow="{{ $completedPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                                        </div>
+                                <div class="admin-dashboard__metric-card">
+                                    <div class="admin-dashboard__metric-value text-success">{{ $completed }}</div>
+                                    <div class="admin-dashboard__metric-label">Completati</div>
+                                    <div class="admin-dashboard__metric-progress">
+                                        <div class="admin-dashboard__metric-progress-bar bg-success" style="width: {{ $completedPercentage }}%"></div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div class="col-lg-4 mb-4">
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h6 class="m-0 font-weight-bold">Stato Dipendenti</h6>
-                    </div>
-                        <div class="card-body">
-                        <canvas id="employeeStatusChart" height="260"></canvas>
+                <div class="col-lg-4 mb-4">
+                    <div class="admin-dashboard__chart-container">
+                        <h3 class="admin-dashboard__chart-title">
+                            <i class="fas fa-users"></i> Stato Dipendenti
+                        </h3>
+                        <div class="chart-container" style="position: relative; height: 260px;">
+                            <canvas id="employeeStatusChart"></canvas>
+                        </div>
 
                         @php
                             $activeUsers = \App\Models\User::whereHas('roles', function($q) {
@@ -208,325 +264,154 @@
                             </div>
                         </div>
                     </div>
-                        </div>
-                    </div>
-                </div>
-
-        <!-- Sezione Statistiche Avanzamento -->
-        <div class="row mb-4">
-            <div class="col-md-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header">
-                        <h6 class="m-0 font-weight-bold">Stato Completamento Attività</h6>
-                    </div>
-                        <div class="card-body">
-                        @php
-                            $totalEmployees = $employeeCount;
-
-                            $completedChecklists = \App\Models\UserChecklistItem::whereHas('user', function($q) {
-                                $q->whereHas('roles', function($q) {
-                                    $q->where('name', 'employee');
-                                });
-                            })
-                            ->where('status', 'completed')
-                            ->count();
-
-                            $totalChecklists = \App\Models\UserChecklistItem::whereHas('user', function($q) {
-                                $q->whereHas('roles', function($q) {
-                                    $q->where('name', 'employee');
-                                });
-                            })->count();
-
-                            $checklistPercentage = $totalChecklists > 0 ? ($completedChecklists / $totalChecklists) * 100 : 0;
-                        @endphp
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Checklist completate</span>
-                                <span>{{ $completedChecklists }} / {{ $totalChecklists }}</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-success" role="progressbar" style="width: {{ $checklistPercentage }}%" aria-valuenow="{{ $checklistPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        @php
-                            $completedDocuments = \App\Models\Document::where('status', 'approved')->count();
-                            $totalDocuments = \App\Models\Document::count();
-                            $documentPercentage = $totalDocuments > 0 ? ($completedDocuments / $totalDocuments) * 100 : 0;
-                        @endphp
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Documenti approvati</span>
-                                <span>{{ $completedDocuments }} / {{ $totalDocuments }}</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-info" role="progressbar" style="width: {{ $documentPercentage }}%" aria-valuenow="{{ $documentPercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-
-                        @php
-                            $totalCourses = \App\Models\Course::count();
-                            $completedCourses = DB::table('course_user')->where('status', 'completed')->count();
-                            $assignedCourses = DB::table('course_user')->count();
-                            $coursePercentage = $assignedCourses > 0 ? ($completedCourses / $assignedCourses) * 100 : 0;
-                        @endphp
-
-                        <div class="mb-3">
-                            <div class="d-flex justify-content-between mb-1">
-                                <span>Corsi completati</span>
-                                <span>{{ $completedCourses }} / {{ $assignedCourses }}</span>
-                            </div>
-                            <div class="progress" style="height: 10px;">
-                                <div class="progress-bar bg-warning" role="progressbar" style="width: {{ $coursePercentage }}%" aria-valuenow="{{ $coursePercentage }}" aria-valuemin="0" aria-valuemax="100"></div>
-                            </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-
-            <div class="col-md-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Completamento per Reparto</h6>
-                    </div>
-                        <div class="card-body">
-                        <canvas id="departmentChart" height="250"></canvas>
-
-                        <div class="mt-3">
-                            <h6 class="font-weight-bold">Dettaglio Completamento</h6>
-                            <div class="table-responsive">
-                                <table class="table table-sm">
-                                    <thead>
-                                        <tr>
-                                            <th>Dipartimento</th>
-                                            <th>Completamento</th>
-                                            <th>Progresso</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @foreach($departmentStats as $dept => $percentage)
-                                            <tr>
-                                                <td>{{ $dept }}</td>
-                                                <td class="text-center">{{ $percentage }}%</td>
-                                                <td>
-                                                    <div class="progress" style="height: 6px;">
-                                                        <div class="progress-bar
-                                                            @if($percentage >= 75)
-                                                                bg-success
-                                                            @elseif($percentage >= 50)
-                                                                bg-info
-                                                            @elseif($percentage >= 25)
-                                                                bg-warning
-                                                            @else
-                                                                bg-danger
-                                                            @endif
-                                                        " role="progressbar" style="width: {{ $percentage }}%"
-                                                        aria-valuenow="{{ $percentage }}" aria-valuemin="0" aria-valuemax="100">
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Sezione Attività Recenti e Utenti Recenti -->
-        <div class="row">
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Attività Recenti</h6>
-                        <a href="#" class="btn btn-sm btn-primary">Vedi Tutte</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
-                            @foreach(\App\Models\UserChecklistItem::with('user', 'checklistItem')->orderBy('updated_at', 'desc')->take(5)->get() as $activity)
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $activity->user->name }}</strong> ha {{ $activity->status === 'completed' ? 'completato' : 'aggiornato' }}:
-                                        {{ Str::limit($activity->checklistItem->text, 50) }}
-                                    </div>
-                                    <small class="text-muted">{{ $activity->updated_at->diffForHumans() }}</small>
-                                </div>
-                            @endforeach
-
-                            @foreach(DB::table('course_user')->join('users', 'course_user.user_id', '=', 'users.id')
-                                    ->join('courses', 'course_user.course_id', '=', 'courses.id')
-                                    ->select('users.name as user_name', 'courses.title as course_title', 'course_user.updated_at', 'course_user.status')
-                                    ->orderBy('course_user.updated_at', 'desc')
-                                    ->take(5)
-                                    ->get() as $courseActivity)
-                                <div class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <strong>{{ $courseActivity->user_name }}</strong> ha {{ $courseActivity->status === 'completed' ? 'completato' : ($courseActivity->status === 'in_progress' ? 'iniziato' : 'ricevuto') }} il corso:
-                                        {{ Str::limit($courseActivity->course_title, 50) }}
-                                    </div>
-                                    <small class="text-muted">{{ \Carbon\Carbon::parse($courseActivity->updated_at)->diffForHumans() }}</small>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+        <!-- Sezione Attività Recenti -->
+        <div class="admin-dashboard__section">
+            <div class="admin-dashboard__section-header">
+                <h2 class="admin-dashboard__section-title">Attività Recenti</h2>
             </div>
 
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Nuovi Dipendenti</h6>
-                        <a href="{{ route('admin.employees.index') }}" class="btn btn-sm btn-primary">Vedi Tutti</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover mb-0">
-                                <thead>
-                                    <tr>
-                                        <th>Nome</th>
-                                        <th>Email</th>
-                                        <th>Ruolo</th>
-                                        <th>Data Registrazione</th>
-                                        <th>Stato</th>
-                                        <th>Azioni</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php
-                                        $newEmployees = \App\Models\User::whereHas('roles', function($q) {
-                                            $q->whereIn('name', ['employee', 'new_hire']);
-                                        })->orderBy('created_at', 'desc')->take(5)->get();
-                                    @endphp
-
-                                    @foreach($newEmployees as $employee)
-                                        <tr>
-                                            <td>{{ $employee->name }}</td>
-                                            <td>{{ $employee->email }}</td>
-                                            <td>
-                                                @foreach($employee->roles as $role)
-                                                    <span class="badge bg-primary">{{ $role->name }}</span>
-                                                @endforeach
-                                            </td>
-                                            <td>{{ $employee->created_at->format('d/m/Y') }}</td>
-                                            <td>
-                                                <span class="badge {{ $employee->status === 'active' ? 'bg-success' : ($employee->status === 'pending' ? 'bg-warning' : 'bg-danger') }}">
-                                                    {{ $employee->status }}
-                                                </span>
-                                            </td>
-                                            <td>
-                                                <div class="btn-group">
-                                                    <a href="{{ route('admin.employees.show', $employee) }}" class="btn btn-sm btn-info">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="{{ route('admin.employees.edit', $employee) }}" class="btn btn-sm btn-warning">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+            <div class="row">
+                <div class="col-md-6 mb-4">
+                    <div class="admin-dashboard__recent-section">
+                        <div class="admin-dashboard__recent-header">
+                            <h3 class="admin-dashboard__recent-title">
+                                <i class="fas fa-user-plus"></i> Ultimi Dipendenti Aggiunti
+                            </h3>
+                            <a href="{{ route('admin.employees.index') }}" class="btn btn-sm btn-outline-primary">Vedi tutti</a>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Ticket e Altri Widget -->
-        <div class="row">
-            <!-- Ultimi Ticket -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Ultimi Ticket</h6>
-                        <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-primary">Vedi Tutti</a>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table mb-0">
-                                <thead class="bg-light">
-                                    <tr>
-                                        <th>ID</th>
-                                        <th>Oggetto</th>
-                                        <th>Dipendente</th>
-                                        <th>Stato</th>
-                                        <th>Data</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @forelse($latestTickets as $ticket)
-                                    <tr>
-                                        <td>#{{ $ticket->id }}</td>
-                                        <td>{{ Str::limit($ticket->subject, 30) }}</td>
-                                        <td>{{ $ticket->user->name }}</td>
-                                        <td>
-                                            <span class="badge {{ $ticket->status === 'open' ? 'bg-danger' : ($ticket->status === 'in_progress' ? 'bg-warning' : 'bg-success') }}">
-                                                {{ $ticket->status === 'open' ? 'Aperto' : ($ticket->status === 'in_progress' ? 'In lavorazione' : 'Risolto') }}
-                                            </span>
-                                        </td>
-                                        <td>{{ $ticket->created_at->format('d/m/Y') }}</td>
-                                    </tr>
-                                    @empty
-                                    <tr>
-                                        <td colspan="5" class="text-center">Nessun ticket trovato</td>
-                                    </tr>
-                                    @endforelse
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Prossimi Eventi -->
-            <div class="col-lg-6 mb-4">
-                <div class="card shadow">
-                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
-                        <h6 class="m-0 font-weight-bold">Prossimi Eventi</h6>
-                        <div>
-
-                            <a href="{{ route('admin.events.index') }}" class="btn btn-sm btn-primary">Vedi Tutti</a>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="list-group list-group-flush">
+                        <div class="admin-dashboard__recent-content">
                             @php
-                                $upcomingEvents = \App\Models\Event::where('start_date', '>', now())->orderBy('start_date', 'asc')->limit(5)->get();
+                                $recentEmployees = \App\Models\User::whereHas('roles', function($q) {
+                                    $q->whereIn('name', ['employee', 'new_hire']);
+                                })->orderBy('created_at', 'desc')->take(5)->get();
                             @endphp
 
-                            @forelse($upcomingEvents as $event)
-                                <div class="list-group-item">
-                                    <div class="d-flex w-100 justify-content-between align-items-center">
-                                        <div>
-                                            <h6 class="mb-1">{{ $event->title }}</h6>
-                                            <small class="text-muted">
-                                                <i class="far fa-calendar-alt me-1"></i> {{ $event->start_date->format('d/m/Y H:i') }}
-                                                <span class="ms-2 badge bg-info">{{ ucfirst($event->type) }}</span>
-                                                @if($event->is_mandatory)
-                                                    <span class="badge bg-danger ms-1">Obbligatorio</span>
-                                                @endif
-                                            </small>
-                                        </div>
-                                        <div>
-                                            <a href="{{ route('admin.events.participants', $event) }}" class="btn btn-sm btn-outline-primary" title="Invita partecipanti">
-                                                <i class="fas fa-user-plus"></i>
-                                            </a>
-                                            <a href="{{ route('admin.events.show', $event) }}" class="btn btn-sm btn-outline-info" title="Visualizza dettagli">
-                                                <i class="fas fa-eye"></i>
-                                            </a>
+                            @forelse($recentEmployees as $employee)
+                                <div class="admin-dashboard__item">
+                                    <div class="admin-dashboard__item-icon">
+                                        <i class="fas fa-user"></i>
+                                    </div>
+                                    <div class="admin-dashboard__item-content">
+                                        <h4 class="admin-dashboard__item-title">{{ $employee->name }}</h4>
+                                        <p class="admin-dashboard__item-subtitle">{{ $employee->email }}</p>
+                                        <div class="admin-dashboard__item-meta">
+                                            <span class="admin-dashboard__item-meta-item">
+                                                <i class="far fa-clock"></i> {{ $employee->created_at->diffForHumans() }}
+                                            </span>
                                         </div>
                                     </div>
+                                    <a href="{{ route('admin.employees.show', $employee) }}" class="admin-dashboard__item-action">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
                                 </div>
                             @empty
-                                <div class="text-center py-4">
-                                    <i class="fas fa-calendar-alt fa-3x text-muted mb-3"></i>
-                                    <p>Non ci sono eventi in programma</p>
+                                <div class="p-4 text-center text-muted">
+                                    Nessun dipendente aggiunto di recente.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="admin-dashboard__recent-section">
+                        <div class="admin-dashboard__recent-header">
+                            <h3 class="admin-dashboard__recent-title">
+                                <i class="fas fa-file-upload"></i> Richieste Documenti Recenti
+                            </h3>
+                            <a href="{{ route('admin.document-requests.index') }}" class="btn btn-sm btn-outline-primary">Vedi tutte</a>
+                        </div>
+                        <div class="admin-dashboard__recent-content">
+                            @php
+                                $recentDocumentRequests = \App\Models\DocumentRequest::with(['employee'])
+                                    ->orderBy('created_at', 'desc')
+                                    ->take(5)
+                                    ->get();
+                            @endphp
+
+                            @forelse($recentDocumentRequests as $request)
+                                <div class="admin-dashboard__item">
+                                    <div class="admin-dashboard__item-icon">
+                                        <i class="fas fa-file-upload"></i>
+                                    </div>
+                                    <div class="admin-dashboard__item-content">
+                                        <h4 class="admin-dashboard__item-title">{{ $request->document_type }}</h4>
+                                        <p class="admin-dashboard__item-subtitle">Richiesto a: {{ $request->employee->name }}</p>
+                                        <div class="admin-dashboard__item-meta">
+                                            <span class="admin-dashboard__item-meta-item">
+                                                <i class="far fa-clock"></i> {{ $request->created_at->diffForHumans() }}
+                                            </span>
+                                            <span class="admin-dashboard__item-meta-item">
+                                                <i class="fas fa-info-circle"></i>
+                                                @if($request->status == 'pending')
+                                                    <span class="text-warning">In attesa</span>
+                                                @elseif($request->status == 'submitted')
+                                                    <span class="text-info">Inviato</span>
+                                                @elseif($request->status == 'approved')
+                                                    <span class="text-success">Approvato</span>
+                                                @elseif($request->status == 'rejected')
+                                                    <span class="text-danger">Rifiutato</span>
+                                                @endif
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('admin.document-requests.show', $request) }}" class="admin-dashboard__item-action">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </div>
+                            @empty
+                                <div class="p-4 text-center text-muted">
+                                    Nessuna richiesta documenti recente.
+                                </div>
+                            @endforelse
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6 mb-4">
+                    <div class="admin-dashboard__recent-section">
+                        <div class="admin-dashboard__recent-header">
+                            <h3 class="admin-dashboard__recent-title">
+                                <i class="fas fa-ticket-alt"></i> Ticket Recenti
+                            </h3>
+                            <a href="{{ route('admin.tickets.index') }}" class="btn btn-sm btn-outline-primary">Vedi tutti</a>
+                        </div>
+                        <div class="admin-dashboard__recent-content">
+                            @php
+                                $recentTickets = \App\Models\Ticket::whereIn('status', ['open', 'in_progress'])
+                                    ->orderBy('created_at', 'desc')
+                                    ->take(5)
+                                    ->get();
+                            @endphp
+
+                            @forelse($recentTickets as $ticket)
+                                <div class="admin-dashboard__item">
+                                    <div class="admin-dashboard__item-icon">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </div>
+                                    <div class="admin-dashboard__item-content">
+                                        <h4 class="admin-dashboard__item-title">{{ $ticket->title }}</h4>
+                                        <p class="admin-dashboard__item-subtitle">{{ Str::limit($ticket->description, 50) }}</p>
+                                        <div class="admin-dashboard__item-meta">
+                                            <span class="admin-dashboard__item-meta-item">
+                                                <i class="far fa-clock"></i> {{ $ticket->created_at->diffForHumans() }}
+                                            </span>
+                                            <span class="admin-dashboard__item-meta-item">
+                                                <i class="fas fa-user"></i> {{ $ticket->user->name }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <a href="{{ route('admin.tickets.show', $ticket) }}" class="admin-dashboard__item-action">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </a>
+                                </div>
+                            @empty
+                                <div class="p-4 text-center text-muted">
+                                    Nessun ticket recente.
                                 </div>
                             @endforelse
                         </div>
@@ -534,265 +419,185 @@
                 </div>
             </div>
         </div>
-
-        <!-- Modal Creazione Rapida Evento -->
-        <div class="modal fade" id="quickEventModal" tabindex="-1" aria-labelledby="quickEventModalLabel" aria-hidden="true">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <form action="{{ route('admin.events.store') }}" method="POST">
-                        @csrf
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="quickEventModalLabel">Crea Nuovo Evento</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body">
-                            <div class="mb-3">
-                                <label for="title" class="form-label">Titolo</label>
-                                <input type="text" class="form-control" id="title" name="title" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Descrizione</label>
-                                <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="location" class="form-label">Luogo</label>
-                                <input type="text" class="form-control" id="location" name="location" required>
-                            </div>
-
-                            <div class="row">
-                                <div class="col-md-6 mb-3">
-                                    <label for="start_date" class="form-label">Data inizio</label>
-                                    <input type="datetime-local" class="form-control" id="start_date" name="start_date" required>
-                                </div>
-
-                                <div class="col-md-6 mb-3">
-                                    <label for="end_date" class="form-label">Data fine</label>
-                                    <input type="datetime-local" class="form-control" id="end_date" name="end_date" required>
-                                </div>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="type" class="form-label">Tipo</label>
-                                <select class="form-select" id="type" name="type" required>
-                                    <option value="training">Formazione</option>
-                                    <option value="workshop">Workshop</option>
-                                    <option value="meeting">Meeting</option>
-                                    <option value="webinar">Webinar</option>
-                                    <option value="other">Altro</option>
-                                </select>
-                            </div>
-
-                            <div class="form-check mb-3">
-                                <input class="form-check-input" type="checkbox" id="is_mandatory" name="is_mandatory">
-                                <label class="form-check-label" for="is_mandatory">
-                                    Evento obbligatorio
-                                </label>
-                            </div>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annulla</button>
-                            <button type="submit" class="btn btn-primary">Crea Evento</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
     </div>
 
-    @push('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Grafico stato dipendenti
-            const employeeStatusChart = new Chart(
-                document.getElementById('employeeStatusChart'),
-                {
+    <x-slot name="scripts">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Grafico stato onboarding
+                const onboardingCtx = document.getElementById('onboardingChart').getContext('2d');
+                const onboardingChart = new Chart(onboardingCtx, {
+                    type: 'line',
+                    data: {
+                        labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
+                        datasets: [{
+                            label: 'Completati',
+                            data: [12, 15, 18, 25, 30, 35, 38, 42, 45, 48, 50, 55],
+                            backgroundColor: 'rgba(54, 179, 126, 0.1)',
+                            borderColor: '#36B37E',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'In corso',
+                            data: [25, 23, 28, 24, 26, 25, 22, 20, 18, 16, 14, 12],
+                            backgroundColor: 'rgba(255, 187, 51, 0.1)',
+                            borderColor: '#FFBB33',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: true
+                        },
+                        {
+                            label: 'Non iniziati',
+                            data: [40, 35, 32, 28, 25, 22, 20, 18, 15, 12, 10, 8],
+                            backgroundColor: 'rgba(255, 87, 87, 0.1)',
+                            borderColor: '#FF5757',
+                            tension: 0.4,
+                            borderWidth: 2,
+                            fill: true
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    color: '#44476a'
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                titleColor: '#44476a',
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                bodyColor: '#44476a',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
+                                borderWidth: 1
+                            }
+                        },
+                        hover: {
+                            mode: 'nearest',
+                            intersect: true
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    color: '#44476a'
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    precision: 0,
+                                    color: '#44476a'
+                                }
+                            }
+                        }
+                    }
+                });
+
+                // Grafico stato dipendenti
+                const statusCtx = document.getElementById('employeeStatusChart').getContext('2d');
+                const statusChart = new Chart(statusCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Attivi', 'In attesa', 'Bloccati'],
                         datasets: [{
                             data: [{{ $activeUsers }}, {{ $pendingUsers }}, {{ $blockedUsers }}],
-                            backgroundColor: ['#1cc88a', '#f6c23e', '#e74a3b'],
-                            hoverBackgroundColor: ['#17a673', '#dda20a', '#c43b2f'],
-                            hoverBorderColor: "rgba(234, 236, 244, 1)",
+                            backgroundColor: [
+                                '#36B37E',
+                                '#FFBB33',
+                                '#FF5757'
+                            ],
+                            borderWidth: 0,
+                            hoverOffset: 4
                         }]
                     },
                     options: {
+                        responsive: true,
                         maintainAspectRatio: false,
+                        cutout: '70%',
                         plugins: {
                             legend: {
                                 display: false
                             },
                             tooltip: {
-                                boxWidth: 20,
-                                padding: 10
-                            }
-                        },
-                        cutout: '70%'
-                    }
-                }
-            );
-
-            // Grafico onboarding
-            const onboardingChart = new Chart(
-                document.getElementById('onboardingChart'),
-                {
-                    type: 'line',
-                    data: {
-                        labels: ['Gen', 'Feb', 'Mar', 'Apr', 'Mag', 'Giu', 'Lug', 'Ago', 'Set', 'Ott', 'Nov', 'Dic'],
-                        datasets: [
-                            {
-                                label: 'Assunzioni',
-                                lineTension: 0.3,
-                                backgroundColor: "rgba(78, 115, 223, 0.05)",
-                                borderColor: "rgba(78, 115, 223, 1)",
-                                pointRadius: 3,
-                                pointBackgroundColor: "rgba(78, 115, 223, 1)",
-                                pointBorderColor: "rgba(78, 115, 223, 1)",
-                                pointHoverRadius: 3,
-                                pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-                                pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-                                pointHitRadius: 10,
-                                pointBorderWidth: 2,
-                                data: [
-                                    {{ $monthsData['hiring'][1] }},
-                                    {{ $monthsData['hiring'][2] }},
-                                    {{ $monthsData['hiring'][3] }},
-                                    {{ $monthsData['hiring'][4] }},
-                                    {{ $monthsData['hiring'][5] }},
-                                    {{ $monthsData['hiring'][6] }},
-                                    {{ $monthsData['hiring'][7] }},
-                                    {{ $monthsData['hiring'][8] }},
-                                    {{ $monthsData['hiring'][9] }},
-                                    {{ $monthsData['hiring'][10] }},
-                                    {{ $monthsData['hiring'][11] }},
-                                    {{ $monthsData['hiring'][12] }}
-                                ]
-                            },
-                            {
-                                label: 'Onboarding Completati',
-                                lineTension: 0.3,
-                                backgroundColor: "rgba(28, 200, 138, 0.05)",
-                                borderColor: "rgba(28, 200, 138, 1)",
-                                pointRadius: 3,
-                                pointBackgroundColor: "rgba(28, 200, 138, 1)",
-                                pointBorderColor: "rgba(28, 200, 138, 1)",
-                                pointHoverRadius: 3,
-                                pointHoverBackgroundColor: "rgba(28, 200, 138, 1)",
-                                pointHoverBorderColor: "rgba(28, 200, 138, 1)",
-                                pointHitRadius: 10,
-                                pointBorderWidth: 2,
-                                data: [
-                                    {{ $monthsData['completed'][1] }},
-                                    {{ $monthsData['completed'][2] }},
-                                    {{ $monthsData['completed'][3] }},
-                                    {{ $monthsData['completed'][4] }},
-                                    {{ $monthsData['completed'][5] }},
-                                    {{ $monthsData['completed'][6] }},
-                                    {{ $monthsData['completed'][7] }},
-                                    {{ $monthsData['completed'][8] }},
-                                    {{ $monthsData['completed'][9] }},
-                                    {{ $monthsData['completed'][10] }},
-                                    {{ $monthsData['completed'][11] }},
-                                    {{ $monthsData['completed'][12] }}
-                                ]
-                            }
-                        ]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top'
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                grid: {
-                                    color: "rgba(0, 0, 0, 0.05)"
-                                }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
-                            }
-                        }
-                    }
-                }
-            );
-
-            // Grafico per dipartimento
-            const departmentChart = new Chart(
-                document.getElementById('departmentChart'),
-                {
-                    type: 'bar',
-                    data: {
-                        labels: [
-                            @foreach($departmentStats as $dept => $percentage)
-                                '{{ $dept }}',
-                            @endforeach
-                        ],
-                        datasets: [
-                            {
-                                label: 'Completamento %',
-                                backgroundColor: [
-                                    'rgba(78, 115, 223, 0.8)',
-                                    'rgba(28, 200, 138, 0.8)',
-                                    'rgba(246, 194, 62, 0.8)',
-                                    'rgba(231, 74, 59, 0.8)',
-                                    'rgba(54, 185, 204, 0.8)'
-                                ],
-                                hoverBackgroundColor: [
-                                    'rgba(78, 115, 223, 1)',
-                                    'rgba(28, 200, 138, 1)',
-                                    'rgba(246, 194, 62, 1)',
-                                    'rgba(231, 74, 59, 1)',
-                                    'rgba(54, 185, 204, 1)'
-                                ],
+                                backgroundColor: 'rgba(255, 255, 255, 0.9)',
+                                titleColor: '#44476a',
+                                bodyColor: '#44476a',
+                                borderColor: 'rgba(0, 0, 0, 0.1)',
                                 borderWidth: 1,
-                                data: [
-                                    @foreach($departmentStats as $percentage)
-                                        {{ $percentage }},
-                                    @endforeach
-                                ]
-                            }
-                        ]
-                    },
-                    options: {
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: false
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                max: 100,
-                                grid: {
-                                    color: "rgba(0, 0, 0, 0.05)"
-                                },
-                                ticks: {
-                                    callback: function(value) {
-                                        return value + "%";
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.raw || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = Math.round((value / total) * 100);
+                                        return `${label}: ${value} (${percentage}%)`;
                                     }
                                 }
-                            },
-                            x: {
-                                grid: {
-                                    display: false
-                                }
                             }
                         }
                     }
+                });
+
+                // Gestione filtri del grafico
+                document.querySelectorAll('.admin-dashboard__chart-filter').forEach(filter => {
+                    filter.addEventListener('click', function() {
+                        document.querySelectorAll('.admin-dashboard__chart-filter').forEach(f => {
+                            f.classList.remove('active');
+                        });
+                        this.classList.add('active');
+
+                        // Qui puoi implementare la logica per aggiornare i dati del grafico
+                        // In base al periodo selezionato (7, 30 o 90 giorni)
+                        const period = this.getAttribute('data-period');
+                        console.log(`Selezionato periodo di ${period} giorni`);
+
+                        // Esempio di aggiornamento dati (simulazione)
+                        if (period === '7') {
+                            updateChartData(onboardingChart,
+                                [5, 8, 10, 15, 18, 20, 22],
+                                [15, 12, 10, 8, 7, 5, 4],
+                                [25, 20, 18, 17, 15, 12, 10]
+                            );
+                        } else if (period === '30') {
+                            updateChartData(onboardingChart,
+                                [12, 15, 18, 25, 30, 35, 38, 42, 45, 48, 50, 55],
+                                [25, 23, 28, 24, 26, 25, 22, 20, 18, 16, 14, 12],
+                                [40, 35, 32, 28, 25, 22, 20, 18, 15, 12, 10, 8]
+                            );
+                        } else if (period === '90') {
+                            updateChartData(onboardingChart,
+                                [10, 12, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60],
+                                [30, 28, 26, 25, 22, 20, 18, 15, 12, 10, 8, 6],
+                                [45, 40, 35, 30, 28, 25, 22, 18, 15, 12, 10, 5]
+                            );
+                        }
+                    });
+                });
+
+                // Funzione per aggiornare i dati del grafico
+                function updateChartData(chart, completedData, inProgressData, notStartedData) {
+                    chart.data.datasets[0].data = completedData;
+                    chart.data.datasets[1].data = inProgressData;
+                    chart.data.datasets[2].data = notStartedData;
+                    chart.update();
                 }
-            );
-        });
-    </script>
-    @endpush
+            });
+        </script>
+    </x-slot>
 </x-layout>
+

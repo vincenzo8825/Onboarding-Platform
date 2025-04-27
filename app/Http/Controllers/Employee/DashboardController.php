@@ -71,6 +71,34 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Get recent notifications (ultime 5)
+        $notifications = $user->notifications()
+            ->orderBy('created_at', 'desc')
+            ->limit(5)
+            ->get();
+
+        // Get next recommended items
+        $nextCourse = null;
+        $nextTask = null;
+        $nextDocument = null;
+
+        // Find next incomplete course
+        $nextCourse = $user->courses()
+            ->wherePivot('status', '!=', "completed")
+            ->orderBy('created_at', 'desc')
+            ->first();
+
+        // Find next incomplete task
+        $nextTask = $user->checklistItems()
+            ->wherePivot('is_completed', 0)
+            ->orderBy('due_date', 'asc')
+            ->first();
+
+        // Find next document to upload
+        $nextDocument = Document::where('uploaded_by', $user->id)
+            ->where('status', '!=', 'approved')
+            ->first();
+
         return view('employee.dashboard', [
             'myProgramCount' => $user->programs()->count(),
             'upcomingEventCount' => Event::upcoming()->count(),
@@ -82,12 +110,16 @@ class DashboardController extends Controller
             'documentsApproved' => $documentsApproved,
             'daysAtCompany' => $daysAtCompany,
             'onboardingPercentage' => $onboardingPercentage,
-            'events' => $upcomingEvents,
+            'upcomingEvents' => $upcomingEvents,
             'tickets' => $supportTickets,
             'checklistItems' => $tasks,
             'courses' => $courses,
             'documentsTodo' => $documentsTodo,
-            'documents' => $documents
+            'documents' => $documents,
+            'notifications' => $notifications,
+            'nextCourse' => $nextCourse,
+            'nextTask' => $nextTask,
+            'nextDocument' => $nextDocument
         ]);
     }
 }

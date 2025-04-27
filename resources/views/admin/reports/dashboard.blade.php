@@ -118,41 +118,61 @@
         <div class="row">
             <div class="col-md-12 mb-4">
                 <div class="card shadow">
-                    <div class="card-header py-3">
-                        <h6 class="m-0 font-weight-bold text-primary">Report Dettagliati</h6>
+                    <div class="card-header py-3 d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">
+                            <i class="fas fa-chart-bar me-2"></i>Report Dettagliati
+                        </h6>
                     </div>
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.onboarding-progress') }}" class="btn btn-primary btn-block">
-                                    Progresso Onboarding Dipendenti
+                                <a href="{{ route('admin.reports.onboarding-progress') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-tasks"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Progresso Onboarding Dipendenti</span>
                                 </a>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.department-stats') }}" class="btn btn-primary btn-block">
-                                    Statistiche per Dipartimento
+                                <a href="{{ route('admin.reports.department-stats') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-building"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Statistiche per Dipartimento</span>
                                 </a>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.course-stats') }}" class="btn btn-primary btn-block">
-                                    Statistiche Corsi
+                                <a href="{{ route('admin.reports.course-stats') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-graduation-cap"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Statistiche Corsi</span>
                                 </a>
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.quiz-stats') }}" class="btn btn-primary btn-block">
-                                    Statistiche Quiz
+                                <a href="{{ route('admin.reports.quiz-stats') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-question-circle"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Statistiche Quiz</span>
                                 </a>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.monthly-trends') }}" class="btn btn-primary btn-block">
-                                    Trend Mensili
+                                <a href="{{ route('admin.reports.monthly-trends') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-chart-line"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Trend Mensili</span>
                                 </a>
                             </div>
                             <div class="col-md-4 mb-3">
-                                <a href="{{ route('admin.reports.ticket-stats') }}" class="btn btn-primary btn-block">
-                                    Statistiche Ticket
+                                <a href="{{ route('admin.reports.ticket-stats') }}" class="btn btn-light btn-icon-split shadow-sm w-100 d-flex align-items-center">
+                                    <span class="icon text-white-50 bg-primary py-2">
+                                        <i class="fas fa-ticket-alt"></i>
+                                    </span>
+                                    <span class="text flex-grow-1 py-2">Statistiche Ticket</span>
                                 </a>
                             </div>
                         </div>

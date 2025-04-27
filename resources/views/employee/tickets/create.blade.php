@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="row justify-content-center">
             <div class="col-md-8">
@@ -9,7 +12,7 @@
                     <div class="card-body">
                         <form action="{{ route('employee.tickets.store') }}" method="POST">
                             @csrf
-                            
+
                             <div class="mb-3">
                                 <label for="title" class="form-label">Titolo</label>
                                 <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title') }}" required>
@@ -17,7 +20,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="category" class="form-label">Categoria</label>
                                 <select class="form-select @error('category') is-invalid @enderror" id="category" name="category" required>
@@ -33,7 +36,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="priority" class="form-label">Priorità</label>
                                 <select class="form-select @error('priority') is-invalid @enderror" id="priority" name="priority" required>
@@ -46,7 +49,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="mb-3">
                                 <label for="description" class="form-label">Descrizione</label>
                                 <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="6" required>{{ old('description') }}</textarea>
@@ -55,7 +58,7 @@
                                     <div class="invalid-feedback">{{ $message }}</div>
                                 @enderror
                             </div>
-                            
+
                             <div class="d-flex justify-content-between">
                                 <a href="{{ route('employee.tickets.index') }}" class="btn btn-secondary">Annulla</a>
                                 <button type="submit" class="btn btn-primary">Invia Ticket</button>

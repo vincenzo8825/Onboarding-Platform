@@ -59,7 +59,7 @@ class ReportController extends Controller
      */
     public function onboardingProgress()
     {
-        $users = User::with(['roles', 'department', 'tasks', 'checklists'])
+        $users = User::with(['roles', 'department', 'tasks'])
             ->whereHas('roles', function ($query) {
                 $query->where('name', 'employee');
             })

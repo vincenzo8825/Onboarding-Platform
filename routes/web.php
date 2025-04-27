@@ -24,11 +24,17 @@ use App\Http\Controllers\Admin\DocumentRequestController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\BadgeController;
 use App\Http\Controllers\EmployeeBadgeController;
+use App\Http\Controllers\StaticPageController;
+use App\Http\Controllers\NotificationsController;
 
 // Route pubbliche
 Route::get('/', function () {
     return view('welcome');
-});
+})->name('welcome');
+
+// Pagine statiche
+Route::get('/privacy', [\App\Http\Controllers\StaticPageController::class, 'privacy'])->name('privacy');
+Route::get('/terms', [\App\Http\Controllers\StaticPageController::class, 'terms'])->name('terms');
 
 // Route di autenticazione personalizzate
 Route::get('login', [LoginController::class, 'showLoginForm'])->middleware('guest')->name('login');
@@ -37,9 +43,17 @@ Route::post('logout', [LoginController::class, 'logout'])->middleware('auth')->n
 
 // Notifiche
 Route::middleware(['auth'])->group(function () {
-    Route::post('/notifications/{id}/mark-as-read', [\App\Http\Controllers\NotificationController::class, 'markAsRead']);
-    Route::post('/notifications/mark-all-as-read', [\App\Http\Controllers\NotificationController::class, 'markAllAsRead']);
-    Route::get('/notifications', [\App\Http\Controllers\NotificationController::class, 'index'])->name('notifications.index');
+    // Aggiungi route per testare notifiche (deve venire prima della route generica)
+    Route::get('notifications/test', [NotificationsController::class, 'testNotification'])->name('notifications.test');
+    Route::get('notifications', [NotificationsController::class, 'index'])->name('notifications.index');
+    Route::post('notifications/{id}/mark-as-read', [NotificationsController::class, 'markAsRead'])->name('notifications.mark-as-read');
+    Route::post('notifications/mark-all-as-read', [NotificationsController::class, 'markAllAsRead'])->name('notifications.mark-all-as-read');
+    Route::delete('notifications/{id}', [NotificationsController::class, 'delete'])->name('notifications.delete');
+    Route::delete('notifications', [NotificationsController::class, 'deleteAll'])->name('notifications.delete-all');
+
+    // API route per il nuovo pannello notifiche
+    Route::get('api/notifications', [NotificationsController::class, 'apiGetNotifications']);
+    Route::get('api/notifications/count', [NotificationsController::class, 'apiGetCount']);
 });
 
 // Registrazione
@@ -79,9 +93,25 @@ Route::get('/unauthorized', function () {
     return view('unauthorized');
 })->name('unauthorized');
 
+// Route per pagina di attesa approvazione
+Route::get('/waiting-approval', function () {
+    return view('auth.waiting-approval.index');
+})->name('waiting-approval')->middleware('auth');
+
 // Route per Admin
-Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
+Route::prefix('admin')->name('admin.')->middleware([
+    'auth',
+    'role:admin',
+    \App\Http\Middleware\EnsureUserIsApproved::class
+])->group(function () {
     Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+
+    // Approvals routes (nuove route per la gestione approvazioni)
+    Route::prefix('approvals')->name('approvals.')->group(function () {
+        Route::get('/', [\App\Http\Controllers\Admin\ApprovalController::class, 'index'])->name('index');
+        Route::post('/{user}/approve', [\App\Http\Controllers\Admin\ApprovalController::class, 'approve'])->name('approve');
+        Route::post('/{user}/reject', [\App\Http\Controllers\Admin\ApprovalController::class, 'reject'])->name('reject');
+    });
 
     // Employees routes
     Route::prefix('employees')->name('employees.')->group(function () {
@@ -93,6 +123,11 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::put('/{employee}', [\App\Http\Controllers\Admin\EmployeeController::class, 'update'])->name('update');
         Route::delete('/{employee}', [\App\Http\Controllers\Admin\EmployeeController::class, 'destroy'])->name('destroy');
         Route::get('/{employee}/request-document', [\App\Http\Controllers\Admin\DocumentRequestController::class, 'create'])->name('request-document');
+
+        // Gestione approvazioni
+        Route::get('/pending-approval', [\App\Http\Controllers\Admin\EmployeeController::class, 'pendingApproval'])->name('pending-approval');
+        Route::post('/{employee}/approve', [\App\Http\Controllers\Admin\EmployeeController::class, 'approve'])->name('approve');
+        Route::post('/{employee}/reject', [\App\Http\Controllers\Admin\EmployeeController::class, 'reject'])->name('reject');
     });
 
     // Programs routes
@@ -215,7 +250,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
         Route::get('/{badge}/edit', [\App\Http\Controllers\BadgeController::class, 'edit'])->name('edit');
         Route::put('/{badge}', [\App\Http\Controllers\BadgeController::class, 'update'])->name('update');
         Route::delete('/{badge}', [\App\Http\Controllers\BadgeController::class, 'destroy'])->name('destroy');
-        Route::post('/{badge}/award', [\App\Http\Controllers\BadgeController::class, 'awardToUser'])->name('award');
+        Route::post('/{badge}/award', [\App\Http\Controllers\BadgeController::class, 'awardBadge'])->name('award');
+        Route::get('/{badge}/award', function(\App\Models\Badge $badge) {
+            return redirect()->route('admin.badges.show', $badge);
+        });
     });
 
     // Document Requests routes
@@ -233,10 +271,22 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     });
 });
 
+// Route diretta per la pagina di approvazione (soluzione alternativa)
+Route::get('/admin/employees/pending-approval-direct', [\App\Http\Controllers\Admin\EmployeeController::class, 'pendingApproval'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('direct.pending-approval');
+
 // Route per Employee
-Route::prefix('employee')->name('employee.')->middleware(['auth', 'role:employee,new_hire'])->group(function () {
+Route::prefix('employee')->name('employee.')->middleware([
+    'auth',
+    'role:employee',
+    \App\Http\Middleware\EnsureUserIsApproved::class
+])->group(function () {
     // Dashboard route
     Route::get('/dashboard', [\App\Http\Controllers\Employee\DashboardController::class, 'index'])->name('dashboard');
+
+    // Support FAQ route
+    Route::get('/support', [\App\Http\Controllers\Employee\SupportController::class, 'index'])->name('support');
 
     // Programs routes
     Route::prefix('programs')->name('programs.')->group(function () {

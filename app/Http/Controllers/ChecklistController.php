@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Events\ChecklistAssigned;
+use App\Events\ChecklistItemStatusUpdated;
 use App\Models\Checklist;
+use App\Models\ChecklistItem;
 use App\Models\User;
 use App\Notifications\ChecklistAssignedNotification;
 use Illuminate\Http\Request;
@@ -151,6 +154,76 @@ class ChecklistController extends Controller
 
         return redirect()->back()
             ->with('success', 'Checklist assegnata con successo');
+    }
+
+    /**
+     * Assegna una checklist a più utenti
+     */
+    public function assignUsers(Request $request, Checklist $checklist)
+    {
+        $validated = $request->validate([
+            'user_ids' => 'required|array',
+            'user_ids.*' => 'exists:users,id',
+            'due_date' => 'nullable|date|after:today',
+        ]);
+
+        foreach ($validated['user_ids'] as $userId) {
+            // Verifica se l'utente ha già questa checklist
+            if (!$checklist->users()->where('user_id', $userId)->exists()) {
+                $checklist->users()->attach($userId, [
+                    'assigned_at' => now(),
+                    'due_date' => $validated['due_date'] ?? null,
+                ]);
+
+                // Crea record per ogni elemento della checklist
+                foreach ($checklist->items as $item) {
+                    $checklist->userChecklistItems()->create([
+                        'user_id' => $userId,
+                        'checklist_item_id' => $item->id,
+                        'status' => 'pending',
+                    ]);
+                }
+
+                // Emetti l'evento per la notifica
+                $user = User::find($userId);
+                event(new ChecklistAssigned($checklist, $user, auth()->user()));
+
+                // Invia direttamente la notifica per garantire che funzioni
+                $user->notify(new \App\Notifications\ChecklistAssignedNotification($checklist, auth()->user()));
+            }
+        }
+
+        return redirect()->route('admin.checklists.show', $checklist)
+            ->with('success', 'Checklist assegnata con successo');
+    }
+
+    /**
+     * Aggiorna lo stato di un elemento della checklist
+     */
+    public function updateItemStatus(Request $request, ChecklistItem $item)
+    {
+        $validated = $request->validate([
+            'user_id' => 'required|exists:users,id',
+            'status' => 'required|in:pending,in_progress,completed,needs_review',
+            'notes' => 'nullable|string',
+        ]);
+
+        $userItem = $item->userItems()->where('user_id', $validated['user_id'])->first();
+
+        if ($userItem) {
+            $oldStatus = $userItem->status;
+            $userItem->update([
+                'status' => $validated['status'],
+                'notes' => $validated['notes'] ?? $userItem->notes,
+                'updated_at' => now(),
+            ]);
+
+            // Emetti l'evento per la notifica
+            $user = User::find($validated['user_id']);
+            event(new ChecklistItemStatusUpdated($item, $user, auth()->user(), $oldStatus, $validated['status']));
+        }
+
+        return redirect()->back()->with('success', 'Stato dell\'elemento aggiornato con successo');
     }
 
     /**

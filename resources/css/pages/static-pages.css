@@ -1,0 +1,150 @@
+
+
+.static-page {
+    line-height: 1.8;
+    color: #444;
+}
+
+.static-page .card {
+    border: none;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: all 0.3s ease;
+}
+
+.static-page .card:hover {
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.12);
+    transform: translateY(-5px);
+}
+
+.static-page .card-header {
+    background: linear-gradient(135deg, var(--primary-color) 0%, #4461da 100%);
+    color: white;
+    padding: 2rem 1.5rem;
+    text-align: center;
+    border-bottom: none;
+    position: relative;
+}
+
+.static-page .card-header h1 {
+    font-weight: 800;
+    margin: 0;
+    font-size: 2.2rem;
+    position: relative;
+    z-index: 1;
+}
+
+.static-page .card-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: url('https://cdn.pixabay.com/photo/2018/01/15/07/51/woman-3083379_1280.jpg') no-repeat center center;
+    opacity: 0.05;
+    background-size: cover;
+}
+
+.static-page .card-body {
+    padding: 2.5rem;
+}
+
+.static-page h2 {
+    color: var(--primary-color);
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.65rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid rgba(var(--primary-color-rgb), 0.1);
+    position: relative;
+}
+
+.static-page h2::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    width: 80px;
+    height: 2px;
+    background-color: var(--primary-color);
+}
+
+.static-page h3 {
+    font-size: 1.35rem;
+    margin-top: 1.75rem;
+    margin-bottom: 1rem;
+    color: #333;
+    font-weight: 600;
+}
+
+.static-page p {
+    margin-bottom: 1.25rem;
+    font-size: 1.05rem;
+}
+
+.static-page ul,
+.static-page ol {
+    margin-bottom: 1.75rem;
+    padding-left: 1.75rem;
+}
+
+.static-page li {
+    margin-bottom: 0.65rem;
+    position: relative;
+}
+
+.static-page ul li::before {
+    content: '•';
+    color: var(--primary-color);
+    font-weight: bold;
+    display: inline-block;
+    width: 1em;
+    margin-left: -1em;
+}
+
+.static-page a {
+    color: var(--primary-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border-bottom: 1px solid transparent;
+}
+
+.static-page a:hover {
+    color: var(--primary-color-dark);
+    border-bottom: 1px solid var(--primary-color);
+}
+
+.static-page .alert-info {
+    background-color: rgba(var(--info-color-rgb), 0.1);
+    border: none;
+    color: var(--info-color-dark);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+}
+
+.static-page .text-muted {
+    color: #6c757d !important;
+    font-size: 0.95rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .static-page .card-header h1 {
+        font-size: 1.8rem;
+    }
+
+    .static-page .card-body {
+        padding: 1.75rem;
+    }
+
+    .static-page h2 {
+        font-size: 1.4rem;
+    }
+
+    .static-page h3 {
+        font-size: 1.2rem;
+    }
+}

@@ -1,0 +1,93 @@
+/* Helper Utilities con BEM */
+.text-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.border-left-primary {
+  border-left: 4px solid var(--primary-color) !important;
+}
+
+.border-left-success {
+  border-left: 4px solid var(--success-color) !important;
+}
+
+.border-left-warning {
+  border-left: 4px solid var(--warning-color) !important;
+}
+
+.border-left-danger {
+  border-left: 4px solid var(--danger-color) !important;
+}
+
+.bg-gradient-primary {
+  background: linear-gradient(180deg, var(--primary-color) 0%, darken(var(--primary-color), 15%) 100%);
+}
+
+.shadow-hover {
+  transition: box-shadow 0.2s;
+}
+
+.shadow-hover:hover {
+  box-shadow: var(--box-shadow) !important;
+}
+
+.cursor-pointer {
+  cursor: pointer;
+}
+
+.min-h-100 {
+  min-height: 100%;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.icon-circle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 50%;
+}
+
+.icon-circle--sm {
+  width: 2rem;
+  height: 2rem;
+}
+
+.icon-circle--lg {
+  width: 4rem;
+  height: 4rem;
+}
+
+.icon-circle--primary {
+  background-color: rgba(var(--primary-color-rgb), 0.1);
+  color: var(--primary-color);
+}
+
+.icon-circle--success {
+  background-color: rgba(var(--success-color-rgb), 0.1);
+  color: var(--success-color);
+}
+
+.icon-circle--warning {
+  background-color: rgba(var(--warning-color-rgb), 0.1);
+  color: var(--warning-color);
+}
+
+.icon-circle--danger {
+  background-color: rgba(var(--danger-color-rgb), 0.1);
+  color: var(--danger-color);
+}

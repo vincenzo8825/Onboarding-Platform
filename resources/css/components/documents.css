@@ -1,0 +1,258 @@
+
+.document-list {
+  margin-bottom: 2rem;
+}
+
+
+.card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  transition: box-shadow 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+
+.badge {
+  font-weight: 500;
+  padding: 0.35em 0.65em;
+}
+
+/*  stili per i messaggi di successo */
+.alert-success {
+  border-left: 4px solid #198754;
+  background-color: rgba(25, 135, 84, 0.1);
+}
+
+.document-list__item {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+  transition: background-color 0.2s;
+}
+
+.document-list__item:last-child {
+  border-bottom: none;
+}
+
+.document-list__item:hover {
+  background-color: #f8f9fa;
+}
+
+.document-list__icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+  color: var(--secondary-color);
+}
+
+.document-list__icon--pdf {
+  color: #dc3545;
+}
+
+.document-list__icon--doc {
+  color: #0d6efd;
+}
+
+.document-list__icon--xls {
+  color: #198754;
+}
+
+.document-list__icon--img {
+  color: #6f42c1;
+}
+
+.document-list__content {
+  flex-grow: 1;
+}
+
+.document-list__title {
+  font-weight: 600;
+  margin-bottom: 0.25rem;
+}
+
+.document-list__meta {
+  display: flex;
+  gap: 1rem;
+  font-size: 0.8rem;
+  color: var(--secondary-color);
+}
+
+.document-list__meta-item {
+  display: flex;
+  align-items: center;
+}
+
+.document-list__meta-icon {
+  margin-right: 0.25rem;
+}
+
+.document-list__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+/* Document Viewer */
+.document-viewer {
+  margin-bottom: 2rem;
+}
+
+.document-viewer__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.document-viewer__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.document-viewer__actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.document-viewer__content {
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  overflow: hidden;
+}
+
+.document-viewer__iframe {
+  width: 100%;
+  height: 600px;
+  border: none;
+}
+
+.document-viewer__placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 400px;
+  background-color: #f8f9fa;
+}
+
+.document-viewer__placeholder-icon {
+  font-size: 3rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.document-viewer__placeholder-text {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.document-viewer__placeholder-subtext {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+/* Checklist Styles */
+.checklist {
+  margin-bottom: 2rem;
+}
+
+.checklist__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.checklist__title {
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.checklist__progress {
+  margin-bottom: 1.5rem;
+}
+
+.checklist__progress-text {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+.checklist__progress-bar {
+  height: 0.5rem;
+  border-radius: 1rem;
+  overflow: hidden;
+}
+
+.checklist__item {
+  position: relative;
+  padding: 1rem;
+  border-bottom: 1px solid #dee2e6;
+}
+
+.checklist__item:last-child {
+  border-bottom: none;
+}
+
+.checklist__item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.checklist__item-title {
+  display: flex;
+  align-items: center;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+
+.checklist__item-number {
+  margin-right: 0.5rem;
+  color: var(--primary-color);
+}
+
+.checklist__item-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.checklist__item-content {
+  margin-top: 1rem;
+}
+
+.checklist__item-description {
+  margin-bottom: 1rem;
+}
+
+.checklist__item--completed .checklist__item-title {
+  text-decoration: line-through;
+  color: var(--secondary-color);
+}
+
+.checklist__item--completed .checklist__item-number {
+  color: var(--success-color);
+}
+
+.checklist__empty {
+  text-align: center;
+  padding: 3rem;
+}
+
+.checklist__empty-icon {
+  font-size: 3rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.checklist__empty-text {
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.checklist__empty-subtext {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}

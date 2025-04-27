@@ -54,12 +54,13 @@ class RegisterController extends Controller
             'email' => $data['email'],
             'password' => Hash::make($data['password']),
             'department_id' => $data['department_id'],
+            'is_approved' => false, // Gli utenti devono essere approvati
         ]);
 
-        // Assegna il ruolo "new_hire" al nuovo utente
-        $newHireRole = Role::where('name', 'new_hire')->first();
-        if ($newHireRole) {
-            $user->roles()->attach($newHireRole->id);
+        // Assegna il ruolo employee di default
+        $role = Role::where('name', 'employee')->first();
+        if ($role) {
+            $user->roles()->attach($role);
         }
 
         return $user;

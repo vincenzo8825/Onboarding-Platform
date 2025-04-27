@@ -21,6 +21,7 @@ class User extends Authenticatable
         'emergency_contact',
         'bio',
         'profile_photo',
+        'is_approved',
     ];
 
     protected $hidden = [
@@ -30,6 +31,7 @@ class User extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'is_approved' => 'boolean',
     ];
 
     /**
@@ -100,6 +102,14 @@ class User extends Authenticatable
 
         $completedTasks = $this->completedTasks()->count();
         return ($completedTasks / $totalTasks) * 100;
+    }
+
+    /**
+     * Alias di onboardingProgress per compatibilità
+     */
+    public function getOnboardingProgress()
+    {
+        return $this->onboardingProgress();
     }
 
     public function completedTasks()
@@ -204,13 +214,6 @@ class User extends Authenticatable
             ->withTimestamps();
     }
 
-    public function checklists()
-    {
-        return $this->belongsToMany(Checklist::class, 'user_checklists')
-            ->withPivot('completed_items', 'total_items', 'is_completed', 'completed_at')
-            ->withTimestamps();
-    }
-
     /**
      * Ottieni tutte le assegnazioni di badge per questo utente.
      */
@@ -249,8 +252,17 @@ class User extends Authenticatable
     public function eventsParticipating()
     {
         return $this->belongsToMany(Event::class, 'event_participants')
-            ->withPivot('status', 'feedback', 'rating', 'attended')
+            ->withPivot('registered_at', 'attended', 'feedback')
             ->withTimestamps();
+    }
+
+    /**
+     * Get all tasks assigned to the user
+     */
+    public function tasks()
+    {
+        return $this->belongsToMany(OnboardingTask::class, 'onboarding_task_user')
+            ->withPivot('completed_at', 'notes');
     }
 
     /**

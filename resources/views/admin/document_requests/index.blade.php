@@ -1,5 +1,7 @@
 <x-layout>
-
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container">
         <div class="row justify-content-center">
         <div class="col-md-12">
@@ -21,7 +23,7 @@
 
                     <div class="mb-4">
                         <a href="{{ route('admin.document-requests.create') }}" class="btn btn-primary">
-                            {{ __('Create New Request') }}
+                            {{ __('Crea Nuovo Documento') }}
                         </a>
                     </div>
 
@@ -30,11 +32,11 @@
                             <thead>
                                 <tr>
                                     <th>ID</th>
-                                    <th>Employee</th>
-                                    <th>Document Type</th>
+                                    <th>Dipendente</th>
+                                    <th>Documento</th>
                                     <th>Status</th>
-                                    <th>Requested At</th>
-                                    <th>Actions</th>
+                                    <th>Richiesto il</th>
+                                    <th>Azioni</th>
                                 </tr>
                             </thead>
                             <tbody>

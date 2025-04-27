@@ -16,6 +16,7 @@ use App\Models\Department;
 use App\Models\UserTask;
 use App\Models\Event;
 use Illuminate\Http\Request;
+use App\Models\DocumentRequest;
 
 class DashboardController extends Controller
 {
@@ -31,6 +32,9 @@ class DashboardController extends Controller
         })->count();
 
         $activeTicketCount = Ticket::whereIn('status', ['open', 'in_progress'])->count();
+
+        // Conteggi per le richieste di documenti
+        $pendingDocumentRequestsCount = \App\Models\DocumentRequest::where('status', 'pending')->count();
 
         // Statistiche per dipartimento
         $departmentStats = [];
@@ -96,14 +100,23 @@ class DashboardController extends Controller
             ->limit(5)
             ->get();
 
+        // Nuovi utenti in attesa di approvazione
+        $pendingApprovalCount = User::where('is_approved', false)
+            ->whereHas('roles', function($query) {
+                $query->where('name', 'employee');
+            })
+            ->count();
+
         return view('admin.dashboard', compact(
             'employeeCount',
             'newHireCount',
             'activeTicketCount',
+            'pendingDocumentRequestsCount',
             'departmentStats',
             'monthsData',
             'latestTickets',
-            'upcomingEvents'
+            'upcomingEvents',
+            'pendingApprovalCount'
         ));
     }
 

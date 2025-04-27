@@ -56,16 +56,15 @@ class DocumentUploadedNotification extends Notification implements ShouldQueue
      *
      * @return array<string, mixed>
      */
-    public function toArray(object $notifiable): array
+    // Verifica che il metodo toArray() contenga tutti i dati necessari
+    public function toArray($notifiable)
     {
         return [
+            'title' => 'Nuovo documento caricato',
+            'message' => "L'utente {$this->user->name} ha caricato un nuovo documento: {$this->document->title}",
+            'url' => route('admin.documents.show', $this->document->id),
             'document_id' => $this->document->id,
-            'document_title' => $this->document->title,
-            'uploaded_by_id' => $this->user->id,
-            'uploaded_by_name' => $this->user->name,
-            'category' => $this->document->category,
-            'message' => 'Nuovo documento "' . $this->document->title . '" caricato da ' . $this->user->name,
-            'url' => route('admin.documents.show', $this->document)
+            'user_id' => $this->user->id,
         ];
     }
 }

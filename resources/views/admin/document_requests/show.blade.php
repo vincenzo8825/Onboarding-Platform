@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-md-12">
@@ -103,14 +106,14 @@
                                         @csrf
                                         <button type="submit" class="btn btn-success">{{ __('Approve Request') }}</button>
                                     </form>
-                                    
+
                                     <form action="{{ route('admin.document-requests.reject', $documentRequest->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-danger" onclick="return confirm('Are you sure you want to reject this request?')">
                                             {{ __('Reject Request') }}
                                         </button>
                                     </form>
-                                    
+
                                     <a href="{{ route('admin.document-requests.edit', $documentRequest->id) }}" class="btn btn-primary">
                                         {{ __('Edit Request') }}
                                     </a>

@@ -14,10 +14,21 @@ class DocumentController extends Controller
     /**
      * Display a listing of the documents.
      */
-    public function index()
+    public function index(Request $request)
     {
-        $documents = Document::with(['user', 'approver'])->latest()->paginate(10);
-        return view('admin.documents.index', compact('documents'));
+        $category = $request->input('category');
+        $query = Document::with(['user', 'approver']);
+
+        if ($category) {
+            $query->where('category', $category);
+        }
+
+        $documents = $query->latest()->paginate(10);
+
+        // Get all distinct categories for the filter dropdown
+        $categories = Document::getCategories();
+
+        return view('admin.documents.index', compact('documents', 'categories', 'category'));
     }
 
     /**
@@ -25,7 +36,8 @@ class DocumentController extends Controller
      */
     public function create()
     {
-        return view('admin.documents.create');
+        $categories = Document::getCategories();
+        return view('admin.documents.create', compact('categories'));
     }
 
     /**
@@ -78,7 +90,8 @@ class DocumentController extends Controller
      */
     public function edit(Document $document)
     {
-        return view('admin.documents.edit', compact('document'));
+        $categories = Document::getCategories();
+        return view('admin.documents.edit', compact('document', 'categories'));
     }
 
     /**

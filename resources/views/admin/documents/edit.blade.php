@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Modifica Documento</h2>
@@ -12,7 +15,7 @@
                 <form action="{{ route('admin.documents.update', $document) }}" method="POST" enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
-                    
+
                     <div class="mb-3">
                         <label for="title" class="form-label">Titolo</label>
                         <input type="text" class="form-control @error('title') is-invalid @enderror" id="title" name="title" value="{{ old('title', $document->title) }}" required>
@@ -20,7 +23,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="description" class="form-label">Descrizione</label>
                         <textarea class="form-control @error('description') is-invalid @enderror" id="description" name="description" rows="3">{{ old('description', $document->description) }}</textarea>
@@ -28,7 +31,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="category" class="form-label">Categoria</label>
                         <input type="text" class="form-control @error('category') is-invalid @enderror" id="category" name="category" value="{{ old('category', $document->category) }}" required list="category-suggestions">
@@ -45,7 +48,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="document_file" class="form-label">File</label>
                         <div class="d-flex align-items-center mb-2">
@@ -60,13 +63,13 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="mb-3 form-check">
                         <input type="checkbox" class="form-check-input" id="is_required" name="is_required" {{ old('is_required', $document->is_required) ? 'checked' : '' }}>
                         <label class="form-check-label" for="is_required">Documento richiesto</label>
                         <small class="form-text text-muted d-block">Se selezionato, i dipendenti dovranno visualizzare questo documento</small>
                     </div>
-                    
+
                     <div class="mb-3">
                         <label for="visibility" class="form-label">Visibilità</label>
                         <select class="form-select @error('visibility') is-invalid @enderror" id="visibility" name="visibility" required>
@@ -78,7 +81,7 @@
                             <div class="invalid-feedback">{{ $message }}</div>
                         @enderror
                     </div>
-                    
+
                     <div class="d-flex justify-content-end">
                         <button type="submit" class="btn btn-primary">Aggiorna Documento</button>
                     </div>

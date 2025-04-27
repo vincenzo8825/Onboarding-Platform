@@ -1,0 +1,60 @@
+
+.table-responsive {
+  margin-bottom: 1rem;
+}
+
+.table {
+  --bs-table-hover-bg: rgba(var(--primary-color-rgb), 0.05);
+}
+
+.table-actions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.table-empty {
+  text-align: center;
+  padding: 3rem;
+}
+
+.table-empty__icon {
+  font-size: 2.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.table-empty__message {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.table-empty__description {
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.table-status {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 0.5rem;
+}
+
+.table-status--active {
+  background-color: var(--success-color);
+}
+
+.table-status--inactive {
+  background-color: var(--secondary-color);
+}
+
+.table-status--pending {
+  background-color: var(--warning-color);
+}
+
+.table-status--error {
+  background-color: var(--danger-color);
+}

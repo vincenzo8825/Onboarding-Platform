@@ -75,6 +75,4 @@ MIT License
 4. Push
 5. Pull Request
 
-## 📞 Supporto
 
-Per supporto: [INSERIRE_EMAIL] o apri un issue

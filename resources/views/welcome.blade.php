@@ -46,13 +46,13 @@
                         Soluzioni Avanzate
                     </div>
                     <div class="clients__logo" data-aos="fade-up" data-aos-delay="300">
-                        InnovaTech
+                    Tech
                     </div>
                     <div class="clients__logo" data-aos="fade-up" data-aos-delay="400">
-                        Logistica Rapida
+                        Logistica
                     </div>
                     <div class="clients__logo" data-aos="fade-up" data-aos-delay="500">
-                        Futura S.p.A.
+                        Futura
                     </div>
                 </div>
             </div>

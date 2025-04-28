@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Ticket #{{ $ticket->id }}: {{ $ticket->title }}</h2>

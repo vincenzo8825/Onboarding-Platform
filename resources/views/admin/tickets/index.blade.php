@@ -1,4 +1,7 @@
 <x-layout>
+    <x-slot name="sidebar">
+        @include('components.sidebar')
+    </x-slot>
     <div class="container py-4">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2>Gestione Ticket</h2>
@@ -27,7 +30,7 @@
                             <option value="closed" {{ $status === 'closed' ? 'selected' : '' }}>Chiusi</option>
                         </select>
                     </div>
-                    
+
                     <div class="col-md-3">
                         <label for="priority" class="form-label">Priorità</label>
                         <select class="form-select" id="priority" name="priority">
@@ -38,7 +41,7 @@
                             <option value="urgent" {{ $priority === 'urgent' ? 'selected' : '' }}>Urgente</option>
                         </select>
                     </div>
-                    
+
                     <div class="col-md-3">
                         <label for="category" class="form-label">Categoria</label>
                         <select class="form-select" id="category" name="category">
@@ -48,7 +51,7 @@
                             @endforeach
                         </select>
                     </div>
-                    
+
                     <div class="col-md-3 d-flex align-items-end">
                         <button type="submit" class="btn btn-primary me-2">Filtra</button>
                         <a href="{{ route('admin.tickets.index') }}" class="btn btn-secondary">Reset</a>
@@ -130,7 +133,7 @@
                             </tbody>
                         </table>
                     </div>
-                    
+
                     <div class="d-flex justify-content-center mt-4">
                         {{ $tickets->links() }}
                     </div>
